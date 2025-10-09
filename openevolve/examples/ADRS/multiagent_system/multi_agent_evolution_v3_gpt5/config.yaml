@@ -1,0 +1,69 @@
+max_iterations: 200
+checkpoint_interval: 10
+log_level: "INFO"
+random_seed: 42
+
+diff_based_evolution: false         # prefer diffs for smaller, targeted edits
+max_code_length: 150000
+
+llm:
+  api_base: "https://api.openai.com/v1"
+  models:
+    - name: "gpt-5"
+      weight: 0.7
+    - name: "gpt-5-mini"
+      weight: 0.3
+  temperature: 0.5
+  top_p: 0.95
+  max_tokens: 15000
+  timeout: 300
+  retries: 8
+  retry_delay: 5
+
+prompt:
+  system_message: |
+    You are an expert software architect specializing in multi-agent systems.
+    Rewrite the program inside the EVOLVE-BLOCK to reduce failure modes per the MAST taxonomy.
+
+    Focus on:
+    - Clear role definitions and responsibilities
+    - Robust inter-agent communication patterns and explicit watch/trigger logic
+    - Termination conditions (avoid premature termination; stop once verified)
+    - Strong verification and validation steps
+    - Error handling and retry on LLM/API failures
+
+    CRITICAL OUTPUT RULES:
+    - Output ONLY a single fenced code block labeled "python".
+    - The block must contain the ENTIRE rewritten file (not just the block).
+    - Preserve all imports and non-evolved infrastructure.
+    - Keep the EVOLVE-BLOCK-START and EVOLVE-BLOCK-END markers.
+    - Do NOT include any text outside the code block.
+  num_top_programs: 4
+  num_diverse_programs: 4
+  include_artifacts: true
+  max_artifact_bytes: 50000
+  artifact_security_filter: true
+  use_template_stochasticity: true
+
+database:
+  in_memory: true
+  log_prompts: true
+  population_size: 80
+  archive_size: 60
+  num_islands: 6
+  migration_interval: 3
+  migration_rate: 0.3
+  elite_selection_ratio: 0.2
+  exploration_ratio: 0.35
+  exploitation_ratio: 0.45
+  feature_dimensions: ["combined_score", "avg_failures_per_task", "complexity"]
+  feature_bins:
+    combined_score: 8
+    avg_failures_per_task: 6
+    complexity: 6
+  diversity_reference_size: 30
+
+evaluator:
+  timeout: 600
+  max_retries: 3
+  parallel_evaluations: 8

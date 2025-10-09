@@ -1,0 +1,20 @@
+# Current Prompt Information
+- Current performance metrics: {metrics}
+- Areas identified for improvement: {improvement_areas}
+
+{artifacts}
+
+# Prompt Evolution History
+{evolution_history}
+
+# Current Prompt
+{current_program}
+
+# Task
+Rewrite the prompt to improve its performance on the specified metrics.
+Provide the complete new prompt text.
+
+IMPORTANT: Make sure your rewritten prompt maintains the same input placeholder ({{input_text}})
+but with improved instructions for better LLM performance.
+
+Your improved prompt:

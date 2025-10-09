@@ -1,0 +1,136 @@
+log_level: "INFO"
+
+# The language of the program to be evolved.
+language: python
+
+# This is a top-level setting that controls the evolution mechanism.
+diff_based_evolution: false
+
+# LLM Configuration
+llm:
+  models:
+    - name: "gemini-2.5-pro"
+      weight: 0.2  # Lower weight for the conservative model
+      api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      api_key: ${GEMINI_API_KEY}
+    - name: "o3"
+      weight: 0.8  # Higher weight for the creative/exploratory model
+      api_base: "https://api.openai.com/v1"
+      api_key: ${OPENAI_API_KEY}
+  temperature: 0.7  # Reduced from 0.95 for more focused generation
+  top_p: 0.9  # Reduced from 0.95 for better quality
+  max_tokens: 32000
+  timeout: 600
+
+prompt:
+  system_message: |-
+    You are an expert in cloud cost optimization. Your task is to evolve a Python strategy class to minimize the cost of completing a task under a deadline using **single-region** cloud instances.
+
+    **CRITICAL INSTRUCTIONS:**
+    1. **Single-Region API:** The strategy uses the classic `_step()` method that returns a `ClusterType` decision each tick
+    2. **Inherit from Strategy:** Your strategy MUST inherit from `Strategy` base class
+    3. **Focus on `_step` method:** This is where your decision logic goes
+    4. **NO decorators:** Do not use @dataclass or other decorators
+
+    ---
+
+    ## **SINGLE-REGION API**
+
+    The strategy makes decisions through the `_step` method. Your decision to switch instances incurs a time and cost penalty (`restart_overhead`), so choose wisely.
+
+    ```python
+    def _step(self, last_cluster_type: ClusterType, has_spot: bool) -> ClusterType:
+        # last_cluster_type: What instance type was running in the previous tick.
+        # has_spot: Whether SPOT is available in the current tick.
+        # Returns: ClusterType.SPOT, ClusterType.ON_DEMAND, or ClusterType.NONE.
+    ```
+
+    **Key Concepts:**
+
+      - **ClusterType.SPOT**: Cheap but can be preempted (unavailable).
+      - **ClusterType.ON\_DEMAND**: Expensive but always available.
+      - **ClusterType.NONE**: No instance is running (waiting state).
+
+    **Pricing:**
+
+      - SPOT: \~$0.97/hour (can be preempted)
+      - ON\_DEMAND: \~$3.06/hour (always available)
+      - Cost ratio (COST\_K): \~3.14 (ON\_DEMAND costs 3.14x more than SPOT).
+
+    -----
+
+    ## **AVAILABLE API & CONTEXT**
+
+    **`self` (The Strategy Object):**
+
+      - Inherits from `Strategy`.
+      - **`self.task_duration` (float):** Total seconds of computation required for the task.
+      - **`self.deadline` (float):** The absolute deadline in seconds from the start.
+      - **`self.task_done_time` (list[float]):** A list tracking progress chunks. Use `sum(self.task_done_time)` to get total progress.
+      - **`self.restart_overhead` (float):** The changeover delay (time penalty) in seconds.
+          - **Trigger:** This overhead is incurred whenever you switch to a **new running instance** (i.e., from `NONE` to `SPOT`/`ON_DEMAND`, or between `SPOT` and `ON_DEMAND`). Switching to `NONE` does not incur this overhead.
+          - **Effect:** During the overhead period, **no task progress is made**, but you still incur the cost of the new instance type.
+      - **`self.remaining_restart_overhead` (float):** If this value is greater than 0, it means the system is currently in a restart overhead period from a previous switch. No progress will occur until it reaches 0.
+
+    **`self.env` (The Environment):**
+
+      - **`self.env.elapsed_seconds` (float):** Total time elapsed since the start.
+      - **`self.env.gap_seconds` (float):** The duration of each tick in seconds.
+      - **`self.env.tick` (int):** The current tick number.
+      - **`self.env.cluster_type` (ClusterType):** The current instance type running.
+
+    **Progress Tracking:**
+
+      - The task is complete when: `self.task_duration - sum(self.task_done_time) <= 1e-3`.
+
+    **Deadline Management:**
+
+      - The critical "point of no return" is when the minimum time you need to finish is greater than or equal to the time you have left.
+      - **Safety Net Rule:** To guarantee completion, you MUST be on `ON_DEMAND` if `(remaining_task + self.restart_overhead) >= remaining_deadline`. This formula represents the worst-case time needed (finish the work plus one more restart) versus the time available. Waiting any longer risks missing the deadline if a `SPOT` instance gets preempted.
+
+    -----
+
+    ## **SUCCESS METRICS**
+
+      - **Target:** Achieve the lowest possible cost while maintaining 100% task completion before the deadline.
+      - **Constraint:** Must meet the deadline 100% of the time.
+
+    You should prioritize parameter-free strategies. Try not to do subtle parameter tuning, since it's not the focus of this competition.
+
+    **DOCUMENTATION FORMAT:**
+    Start your strategy with:
+
+    ```python
+    """
+    **Strategy Keywords:** [e.g., adaptive-threshold, pattern-recognition, cost-aware]
+    **Core Idea:** [Brief description of your approach]
+    """
+    ```
+
+# Database and Evolution Configuration
+database:
+  population_size: 30  # Increased for better diversity
+  archive_size: 15  # Keep more diverse solutions
+  num_islands: 4  # More islands for better diversity
+  elite_selection_ratio: 0.2  # Keep top 20% as elite (stricter)
+  exploitation_ratio: 0.5  # 50% from best programs
+  exploration_ratio: 0.3  # 30% from current island
+
+  migration_rate: 0.1
+  # Remaining 20% is random selection - MORE RANDOMNESS to escape local optima!
+
+# Evaluator and Evolution Configuration  
+evaluator:
+  parallel_evaluations: 2  # Reduced for testing
+  timeout: 900  # 15 minutes per evaluation - enough for 10 traces × 8 configs
+  enable_artifacts: true
+  use_llm_feedback: false
+  # Fixed cascade evaluation configuration to match OpenEvolve implementation
+  cascade_evaluation: true  # Enable cascade evaluation
+  cascade_thresholds: [1.0, 0.5]  # Stage1 must have runs_successfully=1.0 to proceed to stage2
+  cascade_stage_timeout_retries: 3
+
+# Evolution settings
+max_iterations: 100  # Reduced for faster testing, increase to 100+ for production
+checkpoint_interval: 5
+max_code_length: 60000

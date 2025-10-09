@@ -1,0 +1,66 @@
+max_iterations: 500  # Increased iterations
+checkpoint_interval: 5
+log_level: "INFO"
+
+# LLM configuration
+llm:
+  primary_model: "gemini-2.5-pro"
+  primary_model_weight: 1.0
+  secondary_model: "gemini-2.5-flash"
+  secondary_model_weight: 0.2
+  temperature: 0.7
+  top_p: 0.95
+  max_tokens: 32768
+  timeout: 600 
+  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"  # Base URL for API (change for non-OpenAI models)
+  api_key: ${GEMINI_API_KEY}
+
+# Prompt configuration
+prompt:
+  system_message:
+    You are an expert search unit specializing in data compression methods using adaptive bitrate methods. 
+    Your task is to find the best bitrate configuration for the given LLM layer, based on the input and weight 
+    tensor. There are two main tuning knobs - high_bitrate_ratio and alpha. high_bitrate_ratio is used to determine the number
+    of columns that are assigned higher bitrate (4 bits per element) compared to lower bitrate columns (2 bits per element), 
+    where as alpha balances and mixes the magnitude score and the Hessian score of each column when determining the importance of each column.
+    The columns are sorted based on the importance score, and the first first high_bitrate_ratio * num_columns columns are assigned higher bitrate.
+    
+    Your goal is to implement an algorithm inside adaptive_bitrate_model() function optimizes the high bitrate column selection and ratio given an input and weights,
+    and ultimately achieves low bitrate and ppl values for the model.
+
+    Start by sweeping over different alpha values on each kurtosis range, and find the sweet spot of alpha on each range.
+    Then, slowly adjust the bitrate by shaving off or adding small amounts of high_bitrate_ratio to increase accuracy. One way to achieve this is finding a
+    pair of kurtosis ranges where shaving off large amount of bitrate from one range and adding back a small amount on another maintains the accuracy due to different importance
+    of the bitrate and the associated bitrate sweetspot of the range. You can also experiment with using different configurations
+    depending on the index of the current layer, provided using the layer_idx argument to the function.
+
+    The function must return the high_bitrate_ratio float value between 0.0 and 1.0, and the hybrid_rank tensor which has
+    the column indexes sorted based on their importance score. As the function is exported to a separate file to be used in
+    other processes, it must be formatted as a python string.
+
+    The evaluator will return a combined score of 0 if the bitrate is over 2.6 or the wikitext_ppl is over 10.5 or the ptb_ppl is over 18.
+    The evaluator has a weight of 0.5 for wikitext_ppl score, 0.2 for bitrate, and 0.3 for ptb_ppl score.
+
+  num_top_programs: 3
+  num_diverse_programs: 2
+
+# Database configuration
+database:
+  db_path: "./openevolve_output/bq_evolution"
+  population_size: 80
+  archive_size: 30
+  num_islands: 5
+  elite_selection_ratio: 0.3
+  exploitation_ratio: 0.65
+  exploration_ratio: 0.35
+
+# Evaluator configuration
+evaluator:
+  timeout: 900
+  parallel_evaluations: 1
+  use_llm_feedback: false
+
+# Evolution settings
+max_code_length: 30000  
+diff_based_evolution: true  # Use full rewrites instead of diffs
+allow_full_rewrites: false   # Allow full rewrites for constructor functions

@@ -1,0 +1,134 @@
+# Configuration for network input validation evolution
+# Evolves algorithms to validate and repair network interface telemetry data
+
+# Language configuration
+language: python
+max_code_length: 10000
+
+# Evolution settings
+max_iterations: 300
+checkpoint_interval: 10
+diff_based_evolution: false  # Start with full rewrites for simplicity
+
+# LLM configuration  
+llm:
+  primary_model: "o3"
+  primary_model_weight: 0.7
+  secondary_model: "gpt-4o"
+  secondary_model_weight: 0.3
+  api_base: "https://api.openai.com/v1"
+  temperature: 0.7
+  top_p: 0.95
+  max_tokens: 8192
+  timeout: 900  # Increased timeout for reasoning model
+
+# Database configuration
+database:
+  population_size: 200
+  num_islands: 3
+  exploration_ratio: 0.3
+  exploitation_ratio: 0.5
+  # diversity_ratio: 0.2 (remaining probability)
+  
+  # MAP-Elites feature dimensions
+  feature_dimensions: ["complexity", "diversity"]
+  feature_bins: 8
+  
+  # Migration between islands
+  migration_interval: 20
+  migration_rate: 0.15
+
+# Evaluation configuration
+evaluator:
+  timeout: 60
+  max_retries: 2
+  parallel_evaluations: 1
+  cascade_evaluation: false  # We use direct evaluation, not cascade
+
+# Prompt configuration
+prompt:
+  num_top_programs: 2
+  num_diverse_programs: 1
+  include_artifacts: true
+  
+  # Problem-specific context
+  system_message: |
+    You are an expert in network telemetry repair algorithms.
+    
+    # RESEARCH CONTEXT
+    The following research provides important background on network input validation:
+    
+    ## Core Problem
+    Network controllers often receive **incorrect inputs** that don't accurately reflect network state, causing major outages. Over 1/3 of production outages are caused by incorrect inputs to SDN controllers.
+    
+    ## Key Validation Principles
+    
+    ### Three-Step Validation Approach (Hodor System):
+    1. **Signal Collection**: Gather redundant signals from network devices
+    2. **Signal Hardening**: Use redundancy to detect and correct faulty measurements  
+    3. **Dynamic Checking**: Verify inputs against hardened network state
+    
+    ### Critical Network Invariants for Validation:
+    1. **Link Symmetry (R3)**: `my_tx_rate ≈ their_rx_rate` for connected interfaces
+    2. **Flow Conservation (R1)**: `Σ(incoming_traffic) = Σ(outgoing_traffic)` at each router
+    3. **Interface Consistency**: Status should be consistent across connected pairs
+    
+    ## Repair Strategy from Research
+    - **Detection**: Compare outgoing interface count to incoming interface count on each side of links
+    - **Repair**: Use flow conservation principle - traffic into a router must equal traffic out
+    - **Confidence**: Higher confidence when multiple redundant signals agree
+    - **Hardening threshold** (τh ≈ 2%) to account for measurement timing differences
+    
+    # TASK SPECIFICATION
+    
+    Your task is to evolve a Python function called `repair_network_telemetry` that takes 
+    potentially corrupted network interface data and repairs it while providing confidence scores.
+
+    Context about networks: the transmission and receiving rates are the number of bytes sent and received per second. 
+    In a healthy state, packets are not dropped on links or at routers. An interface that is down cannot be sending or receiving.
+    
+    FUNCTION SIGNATURE:
+      def repair_network_telemetry(telemetry: Dict[str, Dict[str, Any]], 
+                             topology: Dict[str, List[str]]) -> Dict[str, Dict[str, Tuple]]:
+    
+    INPUT FORMAT:
+    - Dictionary of interface_id -> telemetry data
+            - interface_status: "up" or "down" 
+            - rx_rate: receive rate in Mbps
+            - tx_rate: transmit rate in Mbps
+            - connected_to: interface_id this interface connects to
+            - local_router: router_id this interface belongs to
+            - remote_router: router_id on the other side
+    - Dictionary of topology where key is router_id and value contains a list of interface_ids. You can use this
+      to find or check relationships that should apply to counters at a single router.
+    - Telemetry data may be corrupted (wrong rates, inconsistent with connected interfaces)
+    
+    OUTPUT FORMAT:
+     - Same structure as telemetry, but telemetry values become (original_value, repaired_value, confidence) tuples
+     - confidence ranges from 0.0 (very uncertain) to 1.0 (very confident in repair)
+     - Non-telemetry fields (connected_to, etc.) are copied unchanged
+     
+     REPAIR STRATEGY:
+    - The best algorithm would be one that leaves correct telemetry unchanged, but detects and
+      repairs telemetry that is wrong to be correct again. 
+    - You can use the topology to help you repair telemetry. 
+    
+    CONFIDENCE CALIBRATION:
+    Your confidence scores will be evaluated for calibration - they must reflect repair accuracy:
+    - That is, the confidence score should be high when the repaired value is very close to the ground truth value.
+    - The confidence score should be low when the repaired value is very different from the ground truth value.
+    - Your solution will be penalised for overconfidence in bad repairs (dangerous)
+    - Your solution will be penalised for underconfidence in good repairs (wasteful)
+    
+    EVALUATION METRICS:
+    1. counter_repair_accuracy: How close repaired rx/tx rates are to ground truth
+    2. status_repair_accuracy: How well interface status is repaired  
+    3. confidence_calibration: How well confidence scores reflect actual repair quality
+    4. combined_score: Weighted combination (75% counter + 5% status + 20% confidence)
+    
+    Focus on algorithms that both repair accurately AND provide accurate indiciations of confidence.
+
+    Think out-loud and reason step-by-step conceptually about what idea you want to try and why. Be detailed in your reasoning. Consider what will
+    make implementing that idea difficult or tricky, and how to do it elegantly. Then provide your code.
+
+    If you *don't* use the topology, please leave a comment in the code explaining why not. It ought to be useful.

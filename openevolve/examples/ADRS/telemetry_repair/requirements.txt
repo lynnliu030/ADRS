@@ -1,0 +1,2 @@
+# No additional dependencies required beyond standard library
+# The network validation algorithms use only built-in Python types and functions 

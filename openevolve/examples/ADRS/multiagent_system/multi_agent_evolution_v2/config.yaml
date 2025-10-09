@@ -1,0 +1,62 @@
+max_iterations: 200
+checkpoint_interval: 10
+log_level: "INFO"
+random_seed: 42
+
+diff_based_evolution: false         # or true, if you prefer diffs
+max_code_length: 100000
+
+llm:
+  api_base: "https://api.openai.com/v1"
+  models:
+    - name: "o3"           # pick a real model you have access to
+      weight: 0.5
+    - name: "gpt-4o"           # pick a real model you have access to
+      weight: 0.5
+  temperature: 0.3
+  top_p: 0.9
+  max_tokens: 8000
+  timeout: 120
+  retries: 5
+  retry_delay: 3
+
+prompt:
+  system_message: |
+    You are an expert software architect specializing in multi-agent systems.
+    Rewrite the program inside the EVOLVE-BLOCK to reduce failure modes.
+
+    CRITICAL OUTPUT RULES:
+    - Output ONLY a single fenced code block labeled "python".
+    - The block must contain the ENTIRE rewritten file (not just the block).
+    - Preserve all imports and non-evolved infrastructure.
+    - Keep the EVOLVE-BLOCK-START and EVOLVE-BLOCK-END markers.
+    - Do NOT include any text outside the code block.
+  num_top_programs: 2
+  num_diverse_programs: 3
+  include_artifacts: true
+  max_artifact_bytes: 50000
+  artifact_security_filter: true
+  use_template_stochasticity: false
+
+database:
+  in_memory: true
+  log_prompts: true
+  population_size: 50
+  archive_size: 30
+  num_islands: 4
+  migration_interval: 5
+  migration_rate: 0.2
+  elite_selection_ratio: 0.15
+  exploration_ratio: 0.25
+  exploitation_ratio: 0.6
+  feature_dimensions: ["combined_score", "avg_failures_per_task", "complexity"]
+  feature_bins:
+    combined_score: 8
+    avg_failures_per_task: 6
+    complexity: 6
+  diversity_reference_size: 15
+
+evaluator:
+  timeout: 400
+  max_retries: 2
+  parallel_evaluations: 4

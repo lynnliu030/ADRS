@@ -1,0 +1,1558 @@
+{
+  "paths": {
+    "ATLAM5": {
+      "ATLAng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "HSTNng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "WASHng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "ATLAM5",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "ATLAng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "ATLAng",
+            "HSTNng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "ATLAng",
+            "WASHng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "CHINng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "CHINng",
+            "NYCMng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "DNVRng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "DNVRng",
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "HSTNng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "HSTNng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "HSTNng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "HSTNng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng",
+            "WASHng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "HSTNng",
+            "LOSAng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "HSTNng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "HSTNng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "IPLSng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "IPLSng",
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "IPLSng",
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "IPLSng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "KSCYng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "KSCYng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "KSCYng",
+            "DNVRng",
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng",
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "LOSAng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "LOSAng",
+            "HSTNng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "LOSAng",
+            "HSTNng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "LOSAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng",
+            "DNVRng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "LOSAng",
+            "HSTNng",
+            "ATLAng",
+            "WASHng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "LOSAng",
+            "SNVAng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "LOSAng",
+            "HSTNng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "NYCMng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "NYCMng",
+            "WASHng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "NYCMng",
+            "WASHng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "NYCMng",
+            "WASHng",
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng",
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "NYCMng",
+            "WASHng",
+            "ATLAng",
+            "HSTNng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "NYCMng",
+            "CHINng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "NYCMng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "SNVAng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "SNVAng",
+            "LOSAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "SNVAng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "SNVAng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "STTLng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "STTLng",
+            "SNVAng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "CHINng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "STTLng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "WASHng": [
+        {
+          "path": [
+            "STTLng",
+            "DNVRng",
+            "KSCYng",
+            "IPLSng",
+            "ATLAng",
+            "WASHng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    },
+    "WASHng": {
+      "ATLAM5": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "ATLAM5"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "ATLAng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "CHINng": [
+        {
+          "path": [
+            "WASHng",
+            "NYCMng",
+            "CHINng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "DNVRng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "HSTNng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "HSTNng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "IPLSng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "IPLSng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "KSCYng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "LOSAng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "HSTNng",
+            "LOSAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "NYCMng": [
+        {
+          "path": [
+            "WASHng",
+            "NYCMng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "SNVAng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "SNVAng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ],
+      "STTLng": [
+        {
+          "path": [
+            "WASHng",
+            "ATLAng",
+            "IPLSng",
+            "KSCYng",
+            "DNVRng",
+            "STTLng"
+          ],
+          "weight": 1.0,
+          "absolute_mbps": 0
+        }
+      ]
+    }
+  }
+}

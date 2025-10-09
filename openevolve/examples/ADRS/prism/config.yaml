@@ -1,0 +1,42 @@
+# Configuration for Real-Time Adaptive Signal Processing Example
+max_iterations: 20
+checkpoint_interval: 1
+log_level: "INFO"
+
+# LLM configuration
+llm:
+  primary_model: "chatgpt-4o-latest"
+  primary_model_weight: 0.7
+  secondary_model: "o3-2025-04-16"
+  secondary_model_weight: 0.3
+  api_base: "https://api.openai.com/v1"
+  temperature: 0.6
+  top_p: 0.95
+  max_tokens: 32000
+
+# Prompt configuration
+prompt:
+  system_message: "You are an expert for model placement on GPUs. Your task is to improve a model placement algorithm by improve the function named compute_model_placement in the intial program that places models to available GPUs. 
+  The algorithm must MINIMIZE the maximum KVPR across all GPUs while ensuring models can fit into the GPUs' memory. Note that KVPR is KV cache pressure for a GPU. It indicates how crowded a GPU is. For a specific GPU, its KVPR is computed as sum(model.req_rate/model.slo for model in models) / (GPU_MEM_SIZE - sum(model.model_size for model in models)), where models are the models on this GPU. The generated program should be as simple as possible and the code should be executed correctly without errors."
+  num_top_programs: 3
+  use_template_stochasticity: true
+
+# Database configuration
+database:
+  population_size: 80
+  archive_size: 30
+  num_islands: 4
+  elite_selection_ratio: 0.15
+  exploitation_ratio: 0.65
+
+# Evaluator configuration
+evaluator:
+  timeout: 90
+  cascade_evaluation: false
+  cascade_thresholds: [0.3, 0.6]
+  parallel_evaluations: 4
+  use_llm_feedback: false
+
+# Evolution settings
+diff_based_evolution: true
+max_code_length: 60000

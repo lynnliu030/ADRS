@@ -1,0 +1,5 @@
+* Update the prompt to improve feature description 
+* Try feedback granularity (i.e. remove comparison v.s. baseline)
+* Try model 
+* Start with uniform progress policy [run in parallel]
+* Remove comparison to the baseline 

@@ -1,0 +1,178 @@
+# Configuration for R Robust Regression Evolution
+
+# General settings
+max_iterations: 100
+checkpoint_interval: 5
+log_level: "INFO"
+
+
+
+# Prompt configuration
+prompt:
+  num_top_programs: 3
+  num_diverse_programs: 2
+  
+  # Include artifacts to show coding errors and performance metrics
+  include_artifacts: true
+  max_artifact_bytes: 4096
+  system_message: |
+    You are a prompt engineer. Suggest different approaches to approximate attention. The following  is the context in which this evolved code lies. Include it in the prepared prompt to help the model.
+    Overview:
+    This file is part of a project which is a comprehensive framework designed for implementing and experimenting with various sparse attention mechanisms in deep learning models.  You will be improving on one of the Maskers. 
+    Overview of Maskers:
+    Maskers are the core components that define how attention patterns are computed in the sparse attention framework. They implement different strategies for determining which key-query pairs should be attended to. A sparse attention in this framework is a series of Masker. Each Masker adds tokens that need to be activated in sparse attention. The data structure to store these active tokens is a Mask class. Details of the Mask class are as follows
+    ### **Mask Class Structure and Functions**
+    The `Mask` class is a sophisticated data structure that represents attention patterns in multiple formats for optimal performance and memory usage. It is a sparse matrix of size `(batch_size, heads, q_len, k_len)` where if an element is 0, that token is inactive for the particular head and query. If it is non-zero, then it is active and the value stores the probability with which the token is sampled. 
+    #### **Core Attributes:**
+    ```python
+    class Mask:
+        def __init__(self, shape, dtype, mask=None, indices=None, ptr=None, 
+                    data=None, from_dense_mask=False, from_index=False, is_full=False):
+            self.shape = shape                    # Shape of the mask (*, n)
+            self.dtype = dtype                    # Data type for mask values
+            self.from_dense_mask = from_dense_mask  # Whether created from dense tensor
+            self.from_index = from_index          # Whether created from sparse indices
+            self.is_full = is_full                # Whether this is a full mask (all 1.0)
+            
+            # Storage attributes (only one is active at a time)
+            self.mask = None      # Dense tensor representation
+            self.indices = None   # Sparse indices
+            self.ptr = None       # Sparse pointer array
+            self.data = None      # Sparse data values
+    ```
+    #### **Mask Class Functions and Signatures:**
+    **Creation Methods:**
+    ```python
+    @classmethod
+    def create_full_mask(shape: Tuple[int, ...], dtype: torch.dtype = torch.float32) -> "Mask"
+    # Creates a full mask (all elements are 1.0) with optimized representation
+    @classmethod
+    def create_mask_from_dense_mask(shape: Tuple[int, ...], mask: torch.Tensor, dtype: torch.dtype = torch.float32) -> "Mask"
+    # Creates a Mask from dense mask tensor
+    @classmethod
+    def create_mask_from_indices(shape: Tuple[int, ...], indices: torch.Tensor, ptr: torch.Tensor, data: Optional[torch.Tensor] = None, dtype: torch.dtype = torch.float32) -> "Mask"
+    # Creates a Mask from sparse indices and pointer representation
+    @classmethod
+    def create_from_row_wise_idx(shape: Tuple[int, ...], row_wise_idx: torch.Tensor, data: torch.Tensor, type: str = "index", dtype: torch.dtype = torch.float32) -> "Mask"
+    # Creates a Mask from row-wise indices
+    @classmethod
+    def create_empty_mask(shape: Tuple[int, ...], dtype: torch.dtype = torch.float32, mask_type: str = "dense") -> "Mask"
+    # Creates a mask object with all values set to zero
+    ```
+    **Access Methods:**
+    ```python
+    def get_dense_mask(self) -> torch.Tensor
+    # Returns the dense mask representation
+    def get_index_mask(self) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]
+    # Returns the sparse index representation (indices, ptr, data)
+    def apply_mask(self, input_tensor: torch.Tensor) -> torch.Tensor
+    # Applies the mask to an input tensor (0 => inactive, >0 => active with weight)
+    def apply_inv_mask(self, input_tensor: torch.Tensor) -> torch.Tensor
+    # Applies the inverse mask to an input tensor (output[IDX] = input[IDX] * 1.0 / mask[IDX])
+    ```
+    **Utility Methods:**
+    ```python
+    def is_full_mask(self) -> bool
+    # Checks if this is a full mask (all elements are 1.0)
+    def is_empty(self) -> bool
+    # Checks if the mask is empty (all elements are 0.0)
+    def get_density(self) -> float
+    # Returns the density/sparsity of the mask (ratio of non-zero elements)
+    def merge_mask(self, other_mask: "Mask", inplace: bool = False) -> "Mask"
+    # Merges this mask with another mask in sparse format
+    ```
+    **Three Representation Formats:**
+    1. **Dense Representation** (`from_dense_mask=True`): Full tensor storage for compatibility
+    2. **Sparse Representation** (`from_index=True`): CSR-like format for memory efficiency  
+    3. **Full Mask Optimization** (`is_full=True`): Zero storage for all-ones masks
+    Mask is a sparse matrix of size batch_size, heads, q_len, k_len . where if an element is 0, that token is inactive for the particular head and query. if it is non-zero then it is active. The final attention using mask is computed as follows,
+    ### **`get_masked_attention_output` Function:**
+    **Function Signature:**
+    ```python
+    def get_masked_attention_output(
+        module: nn.Module,
+        queries: torch.Tensor,
+        keys: torch.Tensor,
+        values: torch.Tensor,
+        attention_mask: Optional[torch.Tensor],
+        scaling: float,
+        dropout: float,
+        sparse_attention_mask: Mask,
+        return_attention_weights: bool = False,
+        **kwargs: Dict[str, Any],
+    ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+    ```
+    **English Description:**
+    This function computes masked attention output by dividing numerator by denominator. It takes the attention module, query/key/value tensors, optional attention mask, scaling factor, dropout probability, and the sparse attention mask object. It optionally returns attention weights along with the output. The function efficiently computes exponential attention weights once and reuses them for both numerator and denominator calculations to avoid redundant computation. **Important**: The function uses `apply_inv_mask` (inverse mask application) during the computation process, which applies the inverse of the mask weights to the attention scores.
+    **Key Steps:**
+    1. **Compute exponential attention weights** using `_compute_masked_exp_attention_weights`
+    2. **Apply inverse mask** using `sparse_attention_mask.apply_inv_mask()` to the exponential attention weights
+    3. **Calculate numerator** by multiplying exponential weights with values
+    4. **Calculate denominator** by summing exponential weights along the last dimension
+    5. **Compute final output** by dividing numerator by denominator
+    6. **Optionally return attention weights** by normalizing exponential weights with denominator
+    **Return Values:**
+    - If `return_attention_weights=False`: Returns attention output tensor of shape `(b, h, sq, d)`
+    - If `return_attention_weights=True`: Returns tuple of `(attention_output, attention_weights)` where attention_weights has shape `(b, h, sq, sk)`
+    You are supposed to write add_mask function for this class which decides what tokens are active and what weights are associated with them . The `add_mask` function is the core method in every masker that defines how attention patterns are computed and applied. It serves as the primary interface between the attention mechanism and the masking logic.
+    ### **Function Signature:**
+    ```python
+    def add_mask(
+        self,
+        keys: torch.Tensor,
+        queries: torch.Tensor,
+        values: torch.Tensor,
+        attention_mask: torch.Tensor,
+        scaling: float,
+        dropout: float,
+        sparse_meta_data: Dict[Any, Any],
+        previous_mask: Mask,
+        **kwargs: Dict[str, Any],
+    ) -> Mask:
+    ```
+    ### **Key Responsibilities:**
+    1. **Pattern Computation**: Determines which key-query pairs should be attended to based on the masker's strategy
+    2. **Mask Generation**: Creates a `Mask` object representing the computed attention pattern
+    3. **Mask Merging**: Combines the new mask with any previous masks to build cumulative attention patterns
+
+# Database configuration
+database:
+  population_size: 100
+  num_islands: 3
+  
+  # Feature dimensions for robust regression
+  feature_dimensions:
+    - "density" 
+    - "error" 
+    - "combined_score"
+
+  feature_bins: 5
+
+# Evaluator configuration
+evaluator:
+  cascade_evaluation: false
+
+log_level: "INFO"
+
+
+# LLM configuration
+llm:
+  primary_model: "gpt-4.1"
+  primary_model_weight: 0.8
+  secondary_model: "o3-mini"
+  secondary_model_weight: 0.2
+  api_base: "https://api.openai.com/v1"
+  
+  temperature: 1.0  # Higher temperature for more creative statistical approaches
+  max_tokens: 4096
+  
+  system_message: |
+    You are an expert statistician and python / pytorch programmer specializing statistical analysis 
+    of approximations. Focus on improving the algorithms ability to select the least amount of tokens
+    (entries in the Mask which are non-zero) while maintaining the approximation quality. 
+    You have to write the add_mask function using native pytorch operations -- mask created in this function 
+    should be as sparse as possible while preserving the ouptut of full attention as much as possible.
+    Approaches to try:
+      1. top-k
+      2. sampling based estimation by setting the right probability in weights.
+      3. Use insights from research on sparse attention to improve the masker.

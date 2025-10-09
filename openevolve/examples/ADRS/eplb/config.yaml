@@ -1,0 +1,58 @@
+# Configuration for function minimization example
+max_iterations: 1000
+checkpoint_interval: 10
+log_level: "INFO"
+
+max_code_length: 65536
+
+# LLM configuration
+llm:
+  primary_model: "gemini-2.5-flash"
+  primary_model_weight: 0.8
+  secondary_model: "gemini-2.5-flash-lite-preview-06-17"
+  secondary_model_weight: 0.2
+  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+  temperature: 0.7
+  timeout: 600
+  top_p: 0.95
+  max_tokens: 131072
+
+# Prompt configuration
+prompt:
+  system_message: "You are an expert programmer specializing in optimization algorithms. Your task is to improve the Mixture-of-Expert models Expert Parallelism Load Balancer (MoE EPLB) expert rearrangement algorithm.
+
+  This algorithm will take the load metrics recorded by the vLLM server, and rearrange the experts to balance the load. It can make replicas of some experts to achieve better load balancing.
+
+  Your goal will be two-fold:
+  1. Improve the algorithm to achieve better load balancing; while
+  2. Improve the algorithm to be more efficient, i.e. reduce the execution time of the algorithm itself, since perfect load balancing is NP-hard.
+  
+  The current algorithm is implemented in the `rebalance_experts` function.
+  "
+  num_top_programs: 3
+  use_template_stochasticity: true
+
+# Database configuration
+database:
+  population_size: 1000
+  archive_size: 100
+  num_islands: 5
+  migration_interval: 50
+  migration_rate: 0.1
+  elite_selection_ratio: 0.1
+  exploration_ratio: 0.2
+  exploitation_ratio: 0.7
+  feature_dimensions:
+    - "score"
+    - "complexity"
+  feature_bins: 10
+
+# Evaluator configuration
+evaluator:
+  timeout: 60
+  parallel_evaluations: 4
+  use_llm_feedback: false
+
+# Evolution settings
+diff_based_evolution: true
+allow_full_rewrites: false

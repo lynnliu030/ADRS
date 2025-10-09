@@ -1,0 +1,207 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {
+      "name": "abilene",
+      "stats": {
+        "nodes": 12,
+        "links": 15,
+        "demands": 132,
+        "min_degree": 1,
+        "avg_degree": 2.5,
+        "std_degree": 0.76,
+        "max_degree": 4,
+        "gini": 0.16,
+        "min_link_len": 132.4,
+        "avg_link_len": 935.56,
+        "max_link_len": 2193.58,
+        "diameter_len": 4706.89,
+        "diameter_hops": 5,
+        "avg_sdp_num": 1.03,
+        "max_sdp_num": 2,
+        "avg_sdp_hops": 2.7,
+        "avg_sdp_len": 1392.35,
+        "avg_adp_num": 2.01,
+        "max_adp_num": 3,
+        "avg_adp_hops": 3.73,
+        "avg_adp_len": 3457.22
+      }
+    },
+    "nodes": [
+      {
+        "name": "ATLAM5",
+        "pos": [
+          -84.38,
+          33.75
+        ],
+        "id": 0
+      },
+      {
+        "name": "ATLAng",
+        "pos": [
+          -85.5,
+          34.5
+        ],
+        "id": 1
+      },
+      {
+        "name": "CHINng",
+        "pos": [
+          -87.62,
+          41.83
+        ],
+        "id": 2
+      },
+      {
+        "name": "DNVRng",
+        "pos": [
+          -105,
+          40.75
+        ],
+        "id": 3
+      },
+      {
+        "name": "HSTNng",
+        "pos": [
+          -95.52,
+          29.77
+        ],
+        "id": 4
+      },
+      {
+        "name": "IPLSng",
+        "pos": [
+          -86.16,
+          39.78
+        ],
+        "id": 5
+      },
+      {
+        "name": "KSCYng",
+        "pos": [
+          -96.6,
+          38.96
+        ],
+        "id": 6
+      },
+      {
+        "name": "LOSAng",
+        "pos": [
+          -118.25,
+          34.05
+        ],
+        "id": 7
+      },
+      {
+        "name": "NYCMng",
+        "pos": [
+          -73.97,
+          40.78
+        ],
+        "id": 8
+      },
+      {
+        "name": "SNVAng",
+        "pos": [
+          -122.03,
+          37.39
+        ],
+        "id": 9
+      },
+      {
+        "name": "STTLng",
+        "pos": [
+          -122.3,
+          47.6
+        ],
+        "id": 10
+      },
+      {
+        "name": "WASHng",
+        "pos": [
+          -77.03,
+          38.9
+        ],
+        "id": 11
+      }
+    ],
+    "links": [
+      {
+        "dist": 132.4,
+        "source": 0,
+        "target": 1
+      },
+      {
+        "dist": 1079.45,
+        "source": 1,
+        "target": 4
+      },
+      {
+        "dist": 590.24,
+        "source": 1,
+        "target": 5
+      },
+      {
+        "dist": 899.49,
+        "source": 1,
+        "target": 11
+      },
+      {
+        "dist": 259.17,
+        "source": 2,
+        "target": 5
+      },
+      {
+        "dist": 1145.19,
+        "source": 2,
+        "target": 8
+      },
+      {
+        "dist": 744.22,
+        "source": 3,
+        "target": 6
+      },
+      {
+        "dist": 1514.43,
+        "source": 3,
+        "target": 9
+      },
+      {
+        "dist": 1571.42,
+        "source": 3,
+        "target": 10
+      },
+      {
+        "dist": 1027.12,
+        "source": 4,
+        "target": 6
+      },
+      {
+        "dist": 2193.58,
+        "source": 4,
+        "target": 7
+      },
+      {
+        "dist": 901.52,
+        "source": 5,
+        "target": 6
+      },
+      {
+        "dist": 503.79,
+        "source": 7,
+        "target": 9
+      },
+      {
+        "dist": 335.08,
+        "source": 8,
+        "target": 11
+      },
+      {
+        "dist": 1136.31,
+        "source": 9,
+        "target": 10
+      }
+    ]
+  }
+  
+  

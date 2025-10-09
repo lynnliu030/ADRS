@@ -1,0 +1,185 @@
+log_level: "INFO"
+
+# Program language
+language: python
+
+# Evolution mode
+diff_based_evolution: false
+
+# LLM configuration
+llm:
+  models:
+    - name: "gemini-2.5-pro"
+      weight: 0.8
+      api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      api_key: ${GEMINI_API_KEY}
+  
+    # - name: "claude-opus-4-1-20250805"
+    #   weight: 1.0
+    #   api_base: "https://api.anthropic.com"
+    #   api_key: ${ANTHROPIC_API_KEY}
+
+    - name: "gpt-5"
+      weight: 0.2
+      # reasoning_effort: high
+      api_key: ${OPENAI_API_KEY}
+  temperature: 0.9
+  top_p: 0.95
+  max_tokens: 32000
+  timeout: 600
+
+prompt:
+  system_message: |-
+    You are designing a single‑region scheduling strategy that must finish D hours
+    of work before a deadline T. SPOT is cheap but can be evicted; On‑Demand is
+    expensive but reliable. Every switch costs d hours during which no progress happens.
+
+    ---
+
+    ## Single‑Region API (concise)
+
+    Implement one Python class that inherits from Strategy and defines a single
+    decision method:
+
+    ```python
+    def _step(self, last_cluster_type: ClusterType, has_spot: bool) -> ClusterType:
+        # return ClusterType.SPOT, ClusterType.ON_DEMAND, or ClusterType.NONE
+    ```
+
+    Available context:
+    - Task
+      • self.task_duration   # total work (hours or seconds)
+      • self.deadline        # absolute deadline from start
+      • self.task_done_time  # list of completed chunks; sum(...) is progress p(t)
+      • self.restart_overhead            # d (time lost when switching)
+      • self.remaining_restart_overhead  # >0 while in switch; no progress then
+    - Environment
+      • self.env.elapsed_seconds  # current time t
+      • self.env.gap_seconds      # tick size; all comparisons should be tick‑aligned
+      • self.env.tick             # tick index
+      • self.env.cluster_type     # currently running type
+
+    Return values:
+      ClusterType.SPOT (cheap, may be evicted),
+      ClusterType.ON_DEMAND (expensive, reliable),
+      ClusterType.NONE (wait; no instance running).
+
+    Treat tick alignment strictly (ceil/floor with gap_seconds). Equality is unsafe.
+
+    ---
+
+    ## UP Intuition (for contrast only; DO NOT implement UP)
+
+    Uniform Progress (UP) sees progress on the time–progress plane and tries to
+    keep enough slack so SPOT remains an option: if you drift toward the red zone,
+    add just enough On‑Demand (OD) to push back and preserve future choice. This is
+    only context — do NOT implement this pattern or any variant of "compare against
+    a baseline/average line and nudge with OD".
+
+    Safety (continuous time): to keep a k‑restart cushion (k∈{1,2}) at time t with
+    progress p(t), you must satisfy
+      T − t ≥ (D − p(t)) + k·d   ⇔   p(t) ≥ D − (T − t) + k·d
+    • 1d line:  p(t) ≥ D − (T − t) + d
+    • 2d line:  p(t) ≥ D − (T − t) + 2d
+
+    Safety (tick‑aligned; preferred for code):
+      left_ticks = floor((T−t)/gap)
+      need0   = ceil((D−p)/gap)
+      need1d  = ceil(((D−p)+d)/gap)
+      need2d  = ceil(((D−p)+2d)/gap)
+      od_ticks = ceil(d/gap)
+    • Reaching 1d: need1d ≥ left_ticks  ⇒ must use On‑Demand to guarantee finish
+    • 2d zone:     need2d ≥ left_ticks  ⇒ treat equality as unsafe (≥ triggers).
+
+    ---
+
+    ## Prohibited Patterns (hard constraints)
+    • Do NOT implement Uniform Progress or any variant that compares to a baseline
+      (e.g., ideal/average progress, B(t)=p−(D/T)·t, “catch up to a line”).
+    • Do NOT use any progress-against-baseline metric to decide OD usage.
+    • Decisions must be expressed only with tick‑aligned variables and observations:
+      left_ticks, need1d, need2d, od_ticks, has_spot, last_cluster_type, and short‑window
+      statistics derived from recent availability (e.g., α, L).
+
+    ## Required Non‑UP Mechanisms (must include all bullets)
+    • Adaptive α/L: Over a short window W ticks, compute
+      - α = fraction of ticks with SPOT available;
+      - L = longest uninterrupted SPOT run (in ticks) within the window.
+      Use α/L to modulate thresholds (waiting budget, exit OD, sealing, cooldown, min dwell).
+    • Tail sealing (endgame): Implement sealing to OD strictly earlier than the 1d line,
+      e.g., seal if left_ticks ≤ need1d + m_lock(α) or when α is low and left_ticks ≤ need2d + m_lock_low.
+      Optionally allow a single thaw (unlock back to SPOT) if has_spot is stable for L≥L_big and
+      left_ticks > need2d + m_unlock(α). Equality is unsafe.
+    • Anti‑flapping: Include a cooldown after preemption/switching and a minimum dwell time
+      for OD (and optionally SPOT) before considering another switch, unless 1d triggers.
+
+    ## Cost Awareness (bounded; optional but recommended)
+    • Treat cost per tick as: c_spot = 1, c_od ≈ 3.14 (On‑Demand about 3.14× SPOT).
+      This is only a tie‑breaker gate; it must never override safety or create
+      a "chase‑baseline" behavior.
+    • Only use cost in profitability guards for OD→SPOT decisions with a minimum dwell:
+      switch OD→SPOT only if both conditions hold:
+        (i) safety/dwell: require a min stable window L_dwell(α) ≥ od_ticks and
+            left_ticks > need2d + m_exit(α), and
+        (ii) cost: expected savings over L_dwell outweigh the restart penalty
+             (use a simple threshold such as L_dwell ≥ ceil(od_ticks · κ/(κ−1)) with κ=3.14).
+      Keep the math simple and tick‑aligned; do not estimate future with complex models.
+    • Before any OD→SPOT attempt, make a quick gut-check that the potential segment can plausibly last longer than the deterministic breakeven H = d/(κ−1) ≈ d/2.14 (comes from equating C_spot·(L+d) = C_od·L); if it feels shorter, stay on OD so the restart overhead is not burned for nothing.
+
+    ## Candidate Non‑UP Directions (pick at least two; keep math simple)
+    1) OD Budget/Debt:
+       - Initialize an OD budget in ticks (e.g., od_budget=floor(k1·need2d) with k1 depending on α).
+       - Spend budget when need2d ≥ left_ticks or α is low; recover only when left_ticks > need2d + m_repair
+         and SPOT runs for L≥L_min(α). When budget≤0, enter conservative mode (no long waiting).
+    2) Pulse Repair (block OD injections):
+       - If cushion thin (left_ticks ≤ need2d + m_pulse(α)) and !has_spot, inject a fixed OD pulse
+         T_pulse ≥ od_ticks. During pulse, ignore brief SPOT flashes; stop when cushion rebuilt
+         (left_ticks > need2d + m_safe(α)).
+    3) Regime Switch (resource‑scarce vs resource‑rich):
+       - Enter scarce regime when α≤α_low or L<od_ticks for W2 ticks; exit only after α≥α_high for W3 ticks.
+       - Rich: wait‑heavy with early OD exit; Scarce: minimal waiting, aggressive sealing, higher m_exit.
+    4) Debounce + Min Dwell:
+       - OD min dwell: once in OD, run at least min_od_ticks(α,L) before considering exit.
+       - SPOT debounce: require has_spot consecutive ≥ M(α) and left_ticks > need2d + m_exit(α) to leave OD.
+    5) Chance‑Constrained Risk Line (simplified):
+       - Define need_risk = ceil(((D−p)+d+h(α,L)·d)/gap) with h∈[1.0,2.0] (larger when α/L low).
+         Treat need_risk ≥ left_ticks as a risk zone with stricter actions than 2d.
+    6) Idle Quota:
+       - Maintain a rolling idle_quota=q(α) over window W; NONE ticks consume it.
+         When quota depleted, disallow waiting until cushion rebuilt or a pulse completes.
+
+    ## Acceptance
+    • Tick‑aligned comparisons only; equality is unsafe.
+    • Clearly state conditions for: wait→OD, OD→SPOT/NONE, sealing/thaw, cooldowns, dwell times.
+    • Keep parameters few and readable; tie them to α/L with simple step functions.
+
+  # allow larger artifacts in prompts
+  max_artifact_bytes: 120000
+  num_top_programs: 2
+  num_diverse_programs: 6
+
+database:
+  population_size: 60
+  archive_size: 30
+  num_islands: 6
+  elite_selection_ratio: 0.2
+  exploitation_ratio: 0.2
+  exploration_ratio: 0.5
+  migration_interval: 5
+  migration_rate: 0.2
+  diversity_reference_size: 40
+  feature_dimensions: ["complexity", "diversity", "score"]
+  feature_bins: 10
+
+evaluator:
+  parallel_evaluations: 2
+  timeout: 900
+  enable_artifacts: true
+  use_llm_feedback: false
+  cascade_evaluation: true
+  cascade_thresholds: [1.0, 0.5]
+
+# Evolution settings
+max_iterations: 100
+checkpoint_interval: 5
+max_code_length: 60000

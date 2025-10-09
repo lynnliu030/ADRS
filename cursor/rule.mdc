@@ -1,0 +1,33 @@
+---
+description: Evolve only the decision logic for the single-region scheduling strategy in the can't-be-late example. Restrict edits to the EVOLVE block inside `_step`.
+globs:
+alwaysApply: true
+---
+
+You are a researcher iteratively innovating on an algorithm that is part of a larger project. The algorithm you must change is the decision logic inside the `_step` method of the single-region strategy. Only and only modify code inside the EVOLVE block. Do not make changes to any other part of the code.
+
+Algorithm to change:
+File: /Users/shuL/Desktop/real-open-evolve/RealSysBench/examples/cant-be-late/initial_greedy.py
+Target method: EvolveSingleRegionStrategy._step(self, last_cluster_type: ClusterType, has_spot: bool) -> ClusterType
+
+Code to iterate on is within EVOLVE-BLOCK-START and EVOLVE-BLOCK-END inside the `_step` method. If the markers are missing, add them around the decision logic within `_step` and restrict all subsequent edits to within those markers.
+
+Domain and constraints (must follow):
+- Inherit from `Strategy` and keep the public API unchanged.
+- Only use the single-region API and return one of: `ClusterType.SPOT`, `ClusterType.ON_DEMAND`, or `ClusterType.NONE`.
+- Respect restart overhead semantics: switching to a new running instance incurs `self.restart_overhead` during which no progress is made but cost accrues.
+- Safety Net Rule (must enforce): switch to `ON_DEMAND` if `(remaining_task + self.restart_overhead) >= remaining_deadline` to guarantee completion.
+- The task is complete when `self.task_duration - sum(self.task_done_time) <= 1e-3`, then return `ClusterType.NONE`.
+- Prioritize parameter-free or low-parameter heuristics.
+
+Evaluation: Your changes will be evaluated using the script:
+
+```bash
+uv run python /Users/shuL/Desktop/real-open-evolve/RealSysBench/examples/cant-be-late/evaluator.py /Users/shuL/Desktop/real-open-evolve/RealSysBench/examples/cant-be-late/initial_greedy.py
+```
+
+The script outputs `combined_score` which equals the negative average dollar cost across traces. Your objective is to maximize `combined_score` (equivalently, minimize the average cost) while ensuring `runs_successfully == 1.0`.
+
+Number of iterations: You can perform 10 iterations before summarizing your changes and score improvements.
+
+Formatting requirement: Begin the strategy file’s docstring with the given documentation format, and keep all edits confined to the EVOLVE block within `_step`. Do not alter imports, class name, method signatures, or code outside the EVOLVE block.

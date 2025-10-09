@@ -1,0 +1,16 @@
+init: 0.546s
+{'balancedness_score': 0.29830835153138974,
+ 'speed_score': 0.03662751051652097,
+ 'combined_score': 0.16746793102395535}
+
+dpsk: 0.273s
+{'balancedness_score': 0.29877129552171616,
+ 'speed_score': 0.07313679733519222,
+ 'combined_score': 0.1859540464284542}
+
+opt: 0.175s
+{'balancedness_score': 0.3527582622846887,
+ 'speed_score': 0.11449329520758433,
+ 'combined_score': 0.23362577874613652}
+
+

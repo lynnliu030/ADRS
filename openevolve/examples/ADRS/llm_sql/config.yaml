@@ -1,0 +1,110 @@
+# Configuration for LLM-Retrieval Optimization
+# Objective: Optimize DataFrame column ordering to maximize prefix hit count for LLM prompt caching
+# Input: DataFrame with rows and columns containing text data
+# Output: Optimized DataFrame with reordered columns that maximize prefix reuse
+
+max_iterations: 100
+checkpoint_interval: 10
+log_level: "INFO"
+
+# LLM configuration
+llm:
+  models:
+    - name: "gemini-2.5-pro"
+      weight: 0.2 # Lower weight for the conservative model
+      api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      api_key: ${GEMINI_API_KEY}
+    - name: "o3"
+      weight: 0.8 # Higher weight for the creative/exploratory model
+      api_base: "https://api.openai.com/v1"
+      api_key: ${OPENAI_API_KEY}
+  temperature: 0.7 # Reduced from 0.95 for more focused generation
+  top_p: 0.95
+  max_tokens: 32000
+  timeout: 600
+
+# Prompt configuration
+prompt:
+  system_message: |
+    You are an expert in data optimization and LLM prompt caching. Your task is to evolve the existing Evolved class to maximize prefix hit count (PHC) for efficient LLM prompt caching.
+
+    Problem Context:
+    - You are given a pandas DataFrame `df` with text data in rows and columns
+    - The goal is to reorder columns to maximize prefix reuse when processing rows sequentially
+    - Prefix reuse occurs when consecutive rows have matching values in the same column positions
+    - This reduces LLM computation costs by reusing cached prefixes
+
+    Objective:
+    - Dual objective: (1) maximize prefix reuse across consecutive rows and (2) minimize end-to-end runtime of the algorithm.
+    - Your goal is to evolve the Evolved class such that when the LLM processes each row sequentially, it reuses as much of the prefix from the previous row as possible, while keeping the algorithm computationally efficient.
+    - Prefix reuse is defined as consecutive field values (starting from the first column) that are **exact matches** with the corresponding fields of the previous row.
+    - The **hit score** of a row is defined as the **sum of squares of the string lengths** of the matching prefix fields.
+    - The algorithm will be evaluated on a combined metric that balances accuracy (prefix reuse) and speed (runtime).
+
+    Formally:
+    - For a given column ordering `C`, PHC(C) = sum over all rows `r` of `hit(C, r)`
+    - `hit(C, r)` = sum of `len(df[r][C[f]])^2` for all f in prefix where `df[r][C[f]] == df[r-1][C[f]]`; zero if mismatch starts at the first field.
+    - Runtime is measured as wall-clock seconds to compute the reordered DataFrame from the input DataFrame.
+    - Combined score used for selection: `combined_score = 0.95 * average_hit_rate + 0.05 * (12 - min(12, average_runtime)) / 12`.
+
+    Required API (DO NOT CHANGE):
+    - You must keep the existing Evolved class structure and the reorder method signature:
+      ```python
+      class Evolved(Algorithm):
+          def reorder(
+              self,
+              df: pd.DataFrame,
+              early_stop: int = 0,
+              row_stop: int = None,
+              col_stop: int = None,
+              col_merge: List[List[str]] = [],
+              one_way_dep: List[Tuple[str, str]] = [],
+              distinct_value_threshold: float = 0.8,
+              parallel: bool = True,
+          ) -> Tuple[pd.DataFrame, List[List[str]]]:
+      ```
+    - You can modify the internal implementation of methods but must preserve the class structure and method signatures
+    - The reorder method must return a tuple of (reordered_dataframe, column_orderings)
+
+    Algorithm Design Guidelines:
+    - For each row, determine the optimal column order based on matches with the previous row
+    - Consider column statistics (unique values, string lengths) for ordering
+    - Implement greedy or heuristic approaches for scalability
+    - Focus on columns with high value frequency and long strings
+    - Handle missing values and mixed data types appropriately
+    - Optimize the existing recursive approach or replace it with more efficient vectorized methods
+    - Consider prefix-aware greedy approaches that condition on the current matched prefix
+
+    Constraints:
+    - Only reorder columns, do not change row order or add/remove rows or columns
+    - You must have different column orderings for different rows to maximize prefit hit rate
+    - Return a DataFrame with the same shape as input
+    - Use exact string matching for prefix calculations
+    - Keep memory usage reasonable for large datasets
+    - Preserve all existing method signatures and class structure
+    - The algorithm will be called with the same parameters as the original Evolved
+
+    Simply return the optimized Evolved class, do not provide explanations.
+  num_top_programs: 3
+  use_template_stochasticity: true
+
+# Database configuration
+database:
+  population_size: 50
+  archive_size: 20
+  num_islands: 3
+  elite_selection_ratio: 0.2
+  exploitation_ratio: 0.7
+
+# Evaluator configuration
+evaluator:
+  timeout: 60
+  cascade_evaluation: false
+  cascade_thresholds: [0.5, 0.75]
+  parallel_evaluations: 4
+  use_llm_feedback: false
+
+# Evolution settings
+diff_based_evolution: true
+allow_full_rewrites: false
+max_code_length: 60000

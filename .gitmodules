@@ -1,0 +1,4 @@
+[submodule "examples/cant-be-late-simulator"]
+	path = examples/cant-be-late-simulator
+	url = https://github.com/cblmemo/cant-be-late.git
+	branch = single-region-evolve

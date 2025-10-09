@@ -1,0 +1,134 @@
+# OpenEvolve Configuration for Multi-Agent System Evolution
+# This configuration optimizes for reducing failure modes in multi-agent systems
+
+# General settings
+max_iterations: 200                    # Fewer iterations for initial testing
+checkpoint_interval: 10                # More frequent checkpoints
+log_level: "INFO"
+random_seed: 42                       # For reproducibility
+
+# Evolution settings
+diff_based_evolution: false            # Use diff-based evolution for code changes
+max_code_length: 100000                # Allow larger code for complex multi-agent systems
+
+# LLM configuration
+llm:
+  # Primary models for evolution - use capable models for code generation
+  models:
+    - name: "gpt-5-nano"
+      weight: 0.3
+    - name: "gpt-5-mini"
+      weight: 0.6
+    - name: "gpt-5"
+      weight: 0.1
+    - name: "o3"
+      weight: 0
+
+  # API configuration
+  api_base: "https://api.openai.com/v1"
+  api_key: null                       # Will use OPENAI_API_KEY env variable
+
+  # Generation parameters - tuned for code evolution
+  temperature: 0.8                    # Higher creativity for exploring solutions
+  top_p: 0.95
+  max_tokens: 6000                    # Larger token limit for complex code
+  timeout: 200                        # Longer timeout for complex reasoning
+  retries: 3
+  retry_delay: 5
+
+# Prompt configuration
+prompt:
+  system_message: |
+    You are an expert software architect specializing in multi-agent systems. 
+    Your goal is to evolve the multi-agent collaboration patterns to minimize 
+    failure modes and improve task completion rates.
+    
+    Focus on:
+    1. Clear role definitions and responsibilities
+    2. Robust inter-agent communication patterns
+    3. Better error handling and failure recovery
+    4. Improved task coordination and sequencing
+    5. More effective verification and validation steps
+    
+    The system is evaluated based on failure mode detection by an LLM judge, 
+    so prioritize solutions that reduce coordination failures, role confusion, 
+    and task derailment.
+
+  # Number of examples to include in evolution prompts
+  num_top_programs: 2                 # Focus on best performers
+  num_diverse_programs: 3             # More diversity for exploration
+
+  # Template variations for creativity
+  use_template_stochasticity: true
+  template_variations:
+    improvement_suggestion:
+      - "Here's how we can improve the multi-agent coordination:"
+      - "I suggest these enhancements to reduce failure modes:"
+      - "We can optimize the agent collaboration by:"
+      - "To minimize coordination failures, let's modify:"
+
+  # Artifact configuration
+  include_artifacts: true             # Include execution traces in prompts
+  max_artifact_bytes: 50000           # Allow larger artifacts for trace analysis
+  artifact_security_filter: true
+
+  # Feature extraction thresholds
+  suggest_simplification_after_chars: 800
+  include_changes_under_chars: 200
+  concise_implementation_max_lines: 15
+  comprehensive_implementation_min_lines: 80
+
+# Database configuration (MAP-Elites algorithm)
+database:
+  # General settings
+  db_path: null                       # In-memory for faster access
+  in_memory: true
+  log_prompts: true                   # Log all interactions for analysis
+
+  # Population parameters
+  population_size: 50                 # Smaller population for faster iteration
+  archive_size: 30                    # Keep top solutions
+  num_islands: 4                      # Multiple islands for diversity
+
+  # Island evolution parameters
+  migration_interval: 5               # Frequent migration for sharing solutions
+  migration_rate: 0.2                # Higher migration rate
+
+  # Selection parameters
+  elite_selection_ratio: 0.15         # More elitism for quality
+  exploration_ratio: 0.25             # Balance exploration
+  exploitation_ratio: 0.6             # Focus on improving good solutions
+
+  # Feature map dimensions for MAP-Elites
+  # These dimensions help maintain diversity in the solution space
+  feature_dimensions:
+    - "combined_score"                # Primary objective: minimize failures
+    - "avg_failures_per_task"         # Secondary: track failure rate
+    - "complexity"                    # Built-in: code complexity
+
+  # Number of bins per dimension
+  feature_bins:
+    combined_score: 8                 # 8 bins for score range
+    avg_failures_per_task: 6          # 6 bins for failure rate
+    complexity: 6                     # 6 bins for complexity
+
+  diversity_reference_size: 15        # Size of reference set for diversity
+
+# Evaluator configuration
+evaluator:
+  # Evaluation timeouts and limits
+  timeout: 400                        # Longer timeout for multi-agent runs
+  max_retries: 2                      # Fewer retries to speed up evaluation
+
+  # # Cascade evaluation for efficiency
+  # cascade_evaluation: true
+  # cascade_thresholds:
+  #   - 0.3                             # Stage 1: Basic functionality
+  #   - 0.6                             # Stage 2: Full evaluation
+
+  # Parallel evaluation
+  parallel_evaluations: 4             # Moderate parallelism to avoid rate limits
+
+  # LLM-based feedback (experimental)
+  use_llm_feedback: false             # Disable for now to focus on failure modes
+  llm_feedback_weight: 0.0
