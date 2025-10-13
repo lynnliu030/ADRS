@@ -7,7 +7,7 @@ This example demonstrates how to use OpenEvolve to optimize the Can't Be Late sc
 1. Install simulator dependencies and unpack the real traces so the evaluator can find them:
 
 ```bash
-cd openevolve/examples/ADRS/cant-be-late-simulator
+cd openevolve/examples/ADRS/cant-be-late/simulator
 uv sync
 mkdir -p data
 [ -d data/real ] || tar -xzf real_traces.tar.gz -C data
