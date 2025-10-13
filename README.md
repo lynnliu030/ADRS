@@ -2,6 +2,8 @@
 
 This repository contains code examples and implementations from the paper **"Barbarians at the Gate: How AI is Upending Systems Research"** ([arXiv:2510.06189](https://arxiv.org/abs/2510.06189)).
 
+Some examples implementations in this repository are still a work in progress (WIP) and may undergo significant changes. We’re actively updating them — stay tuned!
+
 ## Setup
 
 Make sure you have [uv](https://docs.astral.sh/uv/getting-started/installation/) installed.

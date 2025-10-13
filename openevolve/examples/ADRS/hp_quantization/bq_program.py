@@ -1,6 +1,6 @@
 import os
 import time
-from bq.utils import g_str, r_str, y_str, b_str, get_distribution_info
+from utils import g_str, r_str, y_str, b_str
 import subprocess
 import torch
 import threading

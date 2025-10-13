@@ -1,6 +1,4 @@
 from typing import List
-from broadcast import *
-from utils import *
 from pprint import pprint
 import networkx as nx
 import json
@@ -8,7 +6,8 @@ import colorama
 from colorama import Fore, Style
 from utils import networkx_to_graphviz
 from evaluate import *
-
+from broadcast import *
+from utils import *
 
 class BCSimulator:
     # Default variables
