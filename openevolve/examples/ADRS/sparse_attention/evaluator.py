@@ -200,8 +200,8 @@ def run_benchmark_and_collect_metrics(sparse_attention_config):
 
 def evaluate(program_path: str):
     old_path = os.getcwd()
-    os.chdir("/workspace/audrey/sparse-attention-hub/")
-    sys.path.insert(0, "/workspace/audrey/sparse-attention-hub/")
+    os.chdir("./sparse-attention-hub/")
+    sys.path.insert(0, "./sparse-attention-hub/")
 
     if not os.path.isfile(program_path):
         raise FileNotFoundError(f"No such file: {program_path}")
