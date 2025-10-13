@@ -1,19 +1,27 @@
 import functools
 import importlib.util
 import json
+import os
 import time
 import traceback
 from typing import TypedDict
 
 import torch
 
-WORKLOAD_PATH = "/home/bowen/vllm/expert-load/expert-load-20250627_103226-1200.json"
+WORKLOAD_PATH = "expert-load.json"
 REBALANCE_INTERVAL = 100
 
 NUM_REPLICAS = 288
 NUM_GROUPS = 8
 NUM_GPUS = 32
 NUM_NODES = 4
+
+# Check if workload file exists
+if not os.path.exists(WORKLOAD_PATH):
+    raise FileNotFoundError(f"Workload file {WORKLOAD_PATH} not found. "
+        "Please download the workload file as instructed in the `README.md` "
+        "under the `eplb` directory."
+    )
 
 @functools.cache
 def load_workloads(path: str) -> list[torch.Tensor]: 
