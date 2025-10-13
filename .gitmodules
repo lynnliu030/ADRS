@@ -2,3 +2,7 @@
 	path = examples/cant-be-late-simulator
 	url = https://github.com/cblmemo/cant-be-late.git
 	branch = single-region-evolve
+[submodule "openevolve/examples/ADRS/sparse_attention/sparse-attention-hub"]
+	path = openevolve/examples/ADRS/sparse_attention/sparse-attention-hub
+	url = https://github.com/xAlg-ai/sparse-attention-hub
+	branch = openevolve
