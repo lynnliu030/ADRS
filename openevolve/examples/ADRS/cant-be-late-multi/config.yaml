@@ -2,6 +2,8 @@
 initial_program_path: openevolve_multi_region_strategy/initial_program.py
 
 log_level: "INFO"
+# The target file that the LLM will modify.
+evaluation_target_program_path: openevolve_multi_region_strategy/initial_program.py
 
 # The language of the program to be evolved.
 language: python
@@ -13,71 +15,44 @@ diff_based_evolution: false
 llm:
   models:
     - name: "gemini-2.5-pro"
-      weight: 0.2  # Lower weight for the conservative model
+      weight: 1.0  # Lower weight for the conservative model
       api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
-    - name: "o3"
-      weight: 0.8  # Higher weight for the creative/exploratory model
-      api_base: "https://api.openai.com/v1"
+      api_key: ${GEMINI_API_KEY}
   temperature: 0.75  # Increased temperature for more creativity
   top_p: 0.95
   max_tokens: 32000
-  timeout: 600
+  timeout: 300
+
+prompt:
   system_message: |-
-    You are an expert in cloud cost optimization. Your task is to evolve a Python strategy class to minimize the cost of completing a task under a deadline using the NEW multi-region yield-based API.
+    You are an expert in cloud cost optimization. Your task is to evolve a Python strategy class to minimize the cost of completing a task under a deadline.
 
     **CRITICAL INSTRUCTIONS:**
-    1.  **NEW API PATTERN:** The strategy now uses a **yield-based generator pattern** in `_step_multi()`. You MUST follow this new pattern exactly.
+    1.  **STRICTLY ADHERE TO THE API:** You MUST only use the attributes and methods explicitly listed below. DO NOT invent or guess any other function names (e.g., `get_all_region_infos` is FORBIDDEN).
     2.  **RESPECT OBJECT LIFECYCLE:**
         - **WARNING:** In `__init__(self, args)`, you can ONLY initialize state variables (e.g., `self.my_list = []`).
         - You CANNOT access `self.env` or `self.task` in `__init__` because they are not yet available. They are initialized later by the system.
-        - All logic that uses `self.env` or `self.task` MUST be within the `_step_multi` method or other helper methods.
-    3.  **FOCUS ON `_step_multi`:** Your primary goal is to evolve the logic inside the `_step_multi` method using the generator pattern.
-    4.  **MANDATORY CLASS STRUCTURE:** Your strategy class MUST inherit from `MultiRegionStrategy`. Do NOT use decorators like `@dataclass`. Keep the class structure simple and follow the existing pattern.
+        - All logic that uses `self.env` or `self.task` MUST be within the `_step` method or other helper methods called by `_step`.
+    3.  **FOCUS ON `_step`:** Your primary goal is to evolve the logic inside the `_step` method.
 
     ---
-    **NEW MULTI-REGION API PATTERN**
+    **THE HIDDEN RULE: The `_apply_strong_guarantee` Override**
     ---
-    The strategy now communicates with the environment through **yield statements** that model real cloud constraints:
+    **THIS IS THE MOST IMPORTANT RULE.** A hidden function, `_apply_strong_guarantee`, runs *after* your `_step` method and can **override** your decision. Your strategy will be much more successful if you understand and respect this rule.
 
-    ```python
-    def _step_multi(self) -> typing.Generator[Action, typing.Optional[LaunchResult], None]:
-        from sky_spot.multi_region_types import TryLaunch, Terminate
-        
-        # Try to launch in a region
-        result = yield TryLaunch(region=0, cluster_type=ClusterType.SPOT)
-        assert result is not None  # Required due to type system
-        
-        if not result.success:
-            # Try another option
-            result = yield TryLaunch(region=1, cluster_type=ClusterType.ON_DEMAND) 
-            assert result is not None
-            
-        # Terminate instances when needed
-        yield Terminate(region=region_to_terminate)
-    ```
+    **The Rule's Logic:**
+    The system calculates if the remaining task time (`remaining_task_time`) can be completed within the remaining time before the deadline (`remaining_time`).
+    - `remaining_task_time` includes the actual work left AND any overheads for restarting.
+    - `remaining_time` is the time left until the deadline.
 
-    **Key Rules:**
-    - **Information Isolation:** You can ONLY get information through the yield interface. DO NOT call internal methods like `_spot_available_in_region()`
-    - **Always Assert:** After `yield TryLaunch`, always `assert result is not None` (Python type system requirement)
-    - **ON_DEMAND Guaranteed:** ON_DEMAND launches always succeed
-    - **Multi-Instance Support:** The framework supports multiple instances across regions running simultaneously
-    - **CRITICAL - No yield None:** NEVER yield None - this will cause ValueError. If you want to do nothing in a tick, simply `return` (not continue!)
-    - **One Action Per Tick:** The generator is called once per tick. After yielding an action or returning, control goes back to the framework
+    **When the Override is Triggered:**
+    If `remaining_task_time >= remaining_time`, the situation is critical. The system will **FORCE** the decision to `ClusterType.ON_DEMAND` to guarantee progress, **regardless of what your `_step` method returned**.
 
-    **PROGRESS CALCULATION:**
-    - Each tick, if ANY instance is active: `progress += gap_seconds - restart_overhead`
-    - Multiple instances do NOT increase progress rate (they work on the SAME task redundantly)
-    - Progress is tracked in `self.task_done_time` list, use `sum(self.task_done_time)` for total
-    - Example: 2 SPOT instances running = same progress as 1 instance (it's backup, not speedup)
-
-    **SAFETY NET MECHANISM:**
-    - Runs BEFORE your strategy each tick
-    - Triggers when: `remaining_task_time + restart_overhead >= remaining_deadline_time`
-    - Actions when triggered:
-      1. Terminates all non-ON_DEMAND instances
-      2. Forces launch of ON_DEMAND (guaranteed to succeed)
-    - This means: Your strategy CAN'T miss the deadline, but gets penalized for relying on SafetyNet
-    - Be proactive: Switch to ON_DEMAND before SafetyNet forces you to
+    **How to Write a Better Strategy:**
+    - **DO NOT** try to re-implement this logic.
+    - **DO** internalize this rule. Your goal is to create a strategy that is smart enough to **avoid triggering the override**.
+    - A good strategy senses when the deadline is approaching and proactively chooses `ON_DEMAND` *before* the strong guarantee has to take over. This gives you more control and leads to better overall costs.
+    - Use the "Adaptive Urgency" hint below. It is the key to respecting this hidden rule.
 
     ---
     **AVAILABLE API & CONTEXT**
@@ -85,108 +60,33 @@ llm:
 
     **`self` (The Strategy Object):**
     - Inherits from `MultiRegionStrategy`.
-    - **`self.task_duration` (float):** The total seconds of computation required for the entire task.
-    - **`self.deadline` (float):** The deadline in seconds.
+    - **`self.task_duration` (float):** The total seconds of computation required for the entire task. Available only after initialization.
+    - **`self.deadline` (float):** The deadline in seconds. Available only after initialization.
     - **`self.task_done_time` (list[float]):** A list tracking the seconds of work completed. Use `sum(self.task_done_time)` to get total progress.
-    - **IMPORTANT:** There is NO `task.done_time` attribute - use `self.task_done_time` instead!
 
-    **`self.env` (The Environment - MultiTraceEnv):**
+    **`self.env` (The Environment):**
     - **`self.env.elapsed_seconds` (float):** Total time passed in the simulation.
-    - **`self.env.get_active_instances() -> Dict[int, ClusterType]`:** Returns a dictionary mapping region IDs to their cluster types (SPOT or ON_DEMAND).
-    - **Other methods exist but should NOT be called directly - use yield interface instead**
+    - **`self.env.get_num_regions() -> int`:** Returns the total number of available regions.
+    - **`self.env.get_current_region() -> int`:** Returns the index of the region you are currently in.
+    - **`self.env.spot_available() -> bool`:** Returns `True` if a spot instance is available in the CURRENT region.
+    - **`self.env.switch_region(region_idx: int)`:** ACTION: Switches focus to a new region. The new region's state will be available in the *next* time step.
 
     **`self.task` (The Task Object):**
-    - **`self.task.is_done()` (method, not property!):** Returns `True` if the entire task is complete. Call it as a method!
-    
-    **CRITICAL - TASK COMPLETION CHECK:**
-    - **NEVER use progress >= 0.99 or >= 0.999 to check task completion!**
-    - **ALWAYS use: `remaining_task_seconds <= 1e-3`** where `remaining_task_seconds = self.task_duration - sum(self.task_done_time)`
-    - **Why:** Using 99% or 99.9% causes early termination, triggering the safety net which forces expensive ON_DEMAND instances
-    - **Example:** If task needs 172,800s (48h), using >= 0.999 terminates at ~172,627s, leaving 173s unfinished!
+    - **`self.task.is_done` (bool):** Returns `True` if the entire task is complete.
+    - **`self.task.get_info() -> dict`:** Returns a dictionary with details about the current task. For `ChainedTask`, it includes `'current_sub_task_index'`.
 
-    **Action Types (from sky_spot.multi_region_types):**
-    - **`TryLaunch(region: int, cluster_type: ClusterType)`:** Attempt to launch instance in specified region
-    - **`Terminate(region: int)`:** Terminate instance in specified region
-    - **`LaunchResult(success: bool, region: int, cluster_type: Optional[ClusterType])`:** Result of TryLaunch
-
-    **`_step_multi(self)` Method:**
-    - This is your main decision generator, called once per time tick.
-    - Must be a generator that yields `Action` objects and receives `Optional[LaunchResult]`
-    - Use `yield TryLaunch(...)` to attempt launches
-    - Use `yield Terminate(...)` to terminate instances
-    - Multiple instances across regions can run simultaneously
-
-    **EXAMPLE OF CORRECT API USAGE:**
-    ```python
-    def _step_multi(self):
-        from sky_spot.multi_region_types import TryLaunch, Terminate
-        
-        # CORRECT task completion check
-        remaining_task_seconds = self.task_duration - sum(self.task_done_time)
-        if remaining_task_seconds <= 1e-3:
-            # Terminate all active instances
-            active = self.env.get_active_instances()  # Returns Dict[int, ClusterType]
-            for region in active:  # Iterate over keys (region IDs)
-                yield Terminate(region=region)
-            return
-        
-        # Calculate progress for other decisions
-        progress = sum(self.task_done_time) / self.task_duration
-        
-        # If we have active instances and don't need to do anything this tick
-        if self.env.get_active_instances():
-            return  # NOT yield None, NOT continue!
-        
-        # Try to launch
-        result = yield TryLaunch(region=0, cluster_type=ClusterType.SPOT)
-        assert result is not None
-    ```
+    **`_step(self, last_cluster_type: ClusterType, has_spot: bool)` Method:**
+    - This is your main decision point, called once per time tick.
+    - `has_spot` tells you the spot availability in your CURRENT region ONLY.
+    - You must return a `ClusterType` (`SPOT`, `ON_DEMAND`, or `NONE`).
+    - To EXPLORE: Return `ClusterType.NONE` for the current tick and call `self.env.switch_region(...)` to prepare for the next tick.
 
     ---
-    **ADVANCED EVOLUTION STRATEGIES**
+    **ADVANCED HINTS FOR EVOLUTION**
     ---
-    1.  **INTELLIGENT REGION SELECTION:** Don't try regions randomly. Use caching to remember which regions were recently available/unavailable and prioritize accordingly.
-    
-    2.  **ADAPTIVE URGENCY:** Calculate urgency based on progress vs time: 
-        - `progress_ratio = sum(self.task_done_time) / self.task_duration`
-        - `time_ratio = self.env.elapsed_seconds / self.deadline`
-        - If `progress_ratio < time_ratio`, you're behind schedule - be more aggressive with ON_DEMAND
-        
-    3.  **MULTI-INSTANCE STRATEGIES:** Consider running multiple SPOT instances across regions for redundancy when deadline pressure is moderate
-    
-    4.  **COST-AWARE TERMINATION:** When you have multiple instances running, intelligently terminate the more expensive ones
-    
-    5.  **PROACTIVE DEADLINE MANAGEMENT:** Don't wait for the strong guarantee to kick in. Proactively switch to ON_DEMAND when approaching deadline
-        - SafetyNet triggers when: `remaining_task_time + restart_overhead >= remaining_deadline_time`
-        - It will terminate ALL your SPOT instances and force ON_DEMAND
-        - Being proactive avoids the restart overhead penalty from forced migration
-    
-    6.  **EXPLORATION VS EXPLOITATION:** Information has value, especially early in the task. Consider:
-        - Paying to explore unknown regions when you have time buffer
-        - Building confidence intervals around region reliability
-        - Thompson Sampling or UCB-style region selection
-    
-    7.  **REDUNDANCY PATTERNS:** Beyond single-instance strategies:
-        - Hot standby: Keep a second SPOT ready before the first fails
-        - Load balancing: Multiple instances can hedge against individual failures
-        - But remember: redundant ON_DEMAND rarely makes sense
-    
-    8.  **STATE-DEPENDENT DECISIONS:** Your strategy can adapt based on:
-        - Task progress (early/middle/late stage)
-        - Cost spent so far
-        - Patterns in preemption timing
-        - Number of consecutive failures
-    
-    9.  **INFORMATION ASYMMETRY:** You can't check availability without paying, so:
-        - Failed launches still provide valuable information
-        - Recent success/failure is more informative than old data
-        - Consider the cost of information gathering vs potential savings
-
-    **BILLING MODEL:**
-    - Immediate billing upon successful launch
-    - No refunds for early termination  
-    - Cannot terminate in the same tick as launch
-    - Minimum billing unit is one tick
+    1.  **SMARTER EXPLORATION & CACHING (Track Historical Data):** Don't just cycle regions sequentially (`+1`). A superior strategy remembers what it has learned. In `__init__`, create a dictionary like `self.region_cache = {}` to store the last known state of each region. Use this cache to make intelligent decisions about which region to explore next, avoiding regions that were recently unavailable.
+    2.  **ADAPTIVE URGENCY:** Your strategy must be aware of how much time is left. Calculate a "pressure" or "urgency" metric. A simple way is to compare task progress with time elapsed: `progress = sum(self.task_done_time) / self.task_duration` vs `time_gone = self.env.elapsed_seconds / self.deadline`. If `progress < time_gone`, you are behind schedule! When pressure is high, be more aggressive with `ON_DEMAND` to guarantee progress. When pressure is low, you can afford to explore more for cheap `SPOT` instances.
+    3.  **WARNING ON `task_progress`:** You might be tempted to use a variable like `self.task_progress`. This attribute does NOT exist. You MUST calculate progress manually using `sum(self.task_done_time) / self.task_duration`.
 
     **OUTPUT FORMAT:**
     Return ONLY the new Python code to replace the content between the EVOLVE-BLOCK markers. Do not include the markers or any explanations.
@@ -202,7 +102,7 @@ database:
 # Evaluator and Evolution Configuration
 evaluator:
   parallel_evaluations: 4
-  timeout: 600 # 10 minutes per evaluation
+  timeout: 300 # 5 minutes per evaluation
   enable_artifacts: true
   use_llm_feedback: false
   # Cascade evaluation divides the evaluation into multiple stages.
