@@ -18,8 +18,8 @@ mkdir -p data
 ```bash
 source .env # If you have a .env file
 
-echo "OPENAI_API_KEY"
-echo "GEMINI_API_KEY"
+echo "$OPENAI_API_KEY"
+echo "$GEMINI_API_KEY"
 ```
 
 ## Run the evolution

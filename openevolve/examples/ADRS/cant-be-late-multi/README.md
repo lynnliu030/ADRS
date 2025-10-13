@@ -8,11 +8,9 @@ This example demonstrates how to use OpenEvolve to optimize the Can't Be Late sc
 
 ```bash
 cd openevolve/examples/ADRS/cant-be-late-multi/simulator
-tar -xzf real_traces.tar.gz -C data
-uv venv -p 3.12
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
+tar -xzf real_traces.tar.gz data
+uv pip install -r requirements.txt
+uv pip install -r requirements-dev.txt
 ```
 
 2. Make sure you have the API keys expected by the run (replace with your own values or source a `.env` file).
@@ -20,7 +18,7 @@ pip install -r requirements-dev.txt
 ```bash
 source .env # If you have a .env file
 
-echo "GEMINI_API_KEY"
+echo "$GEMINI_API_KEY"
 ```
 
 ## Run the evolution
