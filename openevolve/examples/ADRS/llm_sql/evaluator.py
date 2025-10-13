@@ -10,7 +10,7 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parent_dir)
 import importlib.util
 
-from utils import evaluate_cell_hit_cnt, evaluate_df_prefix_hit_cnt
+from utils import evaluate_df_prefix_hit_cnt
 from initial_program import Evolved
 from quick_greedy import QuickGreedy
 
@@ -31,7 +31,6 @@ def run_quick(
     end = time.time() - st
 
     results = evaluate_df_prefix_hit_cnt(quick)
-    # results = evaluate_cell_hit_cnt(quick)
     return results, end
 
 def run_evolved(
@@ -50,7 +49,6 @@ def run_evolved(
     end = time.time() - st
 
     results = evaluate_df_prefix_hit_cnt(reordered)
-    # results = evaluate_cell_hit_cnt(reordered)
     return results, end
 
 
@@ -82,11 +80,11 @@ def evaluate(program_path):
             }
 
         # Test on different datasets
-        test_files = ["openevolve/data/movies.csv",
-        "openevolve/data/beer.csv",
-        "openevolve/data/BIRD.csv",
-        "openevolve/data/PDMX.csv",
-        "openevolve/data/products.csv"]
+        test_files = ["datasets/movies.csv",
+        "datasets/beer.csv",
+        "datasets/BIRD.csv",
+        "datasets/PDMX.csv",
+        "datasets/products.csv"]
 
         col_merges = [
             [['movieinfo', 'movietitle', 'rottentomatoeslink']],
@@ -159,11 +157,11 @@ def evaluate(program_path):
 
 
 if __name__ == "__main__":
-    test_files = ["openevolve/data/movies.csv",
-        "openevolve/data/beer.csv",
-        "openevolve/data/BIRD.csv",
-        "openevolve/data/PDMX.csv",
-        "openevolve/data/products.csv"]
+    test_files = ["datasets/movies.csv",
+        "datasets/beer.csv",
+        "datasets/BIRD.csv",
+        "datasets/PDMX.csv",
+        "datasets/products.csv"]
     col_merges = [
         [['movieinfo', 'movietitle', 'rottentomatoeslink']],
         [['beer/beerId', 'beer/name']],
