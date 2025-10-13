@@ -180,7 +180,7 @@ def evaluate(program_path):
 
         # Combined score - higher is better, positive values that scale with makespan
         # Use reciprocal scaling: higher makespan = lower score, but always positive
-        combined_score = 1000 / (1 + makespan) * 1000 if time_taken < 2 else 0.0
+        combined_score = 1000 / (1 + makespan) * 1000 
 
         print(f"Evaluation: valid={valid}, makespan={makespan}, time={eval_time:.2f}s")
 
@@ -222,7 +222,7 @@ def evaluate_stage1(program_path):
                     break
 
             # Simple combined score for stage 1 - positive values that scale with makespan
-            combined_score = 1000 / (1 + makespan) * 1000 if valid and time_taken < 2 else 0.0
+            combined_score = 1000 / (1 + makespan) * 1000 if valid else 0.0
 
             # Return evaluation metrics
             return {
