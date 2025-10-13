@@ -1,0 +1,3 @@
+env: trace
+
+trace-file: data/poisson/gap_1200_hourly-rate_0.1/1.json

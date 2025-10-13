@@ -28,6 +28,7 @@ dev = [
     "mypy>=0.950",
 ]
 cant_be_late = ["cant-be-late"]
+cant_be_late_multi = ["cant-be-late-multi"]
 
 [tool.black]
 line-length = 100
@@ -55,4 +56,5 @@ include = ["openevolve*"]
 version = {attr = "openevolve._version.__version__"}
 
 [tool.uv.sources]
-cant-be-late = { path = "examples/cant-be-late-simulator", editable = true, extra = "cant_be_late" }
+cant-be-late = { path = "openevolve/examples/ADRS/cant-be-late/simulator", editable = true, extra = "cant_be_late" }
+cant-be-late-multi = { path = "openevolve/examples/ADRS/cant-be-late-multi/simulator", editable = true, extra = "cant_be_late_multi" }

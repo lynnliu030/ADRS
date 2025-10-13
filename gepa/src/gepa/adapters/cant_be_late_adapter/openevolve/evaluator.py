@@ -35,8 +35,8 @@ logger = logging.getLogger(__name__)
 FAILED_SCORE = -100000.0
 
 # Use parent directory path for simulator and extracted traces
-PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = os.path.join(PARENT_DIR, "cant-be-late-simulator")
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.join(CURRENT_DIR, "simulator")
 TRACE_ARCHIVE_ROOT = Path(__file__).resolve().parents[4] / "exp" / "real"
 
 os.environ["WANDB_MODE"] = "offline"
