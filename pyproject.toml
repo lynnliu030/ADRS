@@ -28,6 +28,7 @@ dev = [
     "mypy>=0.950",
 ]
 cant_be_late = ["cant-be-late"]
+cant_be_late_multi = ["cant-be-late-multi"]
 
 [tool.black]
 line-length = 100
