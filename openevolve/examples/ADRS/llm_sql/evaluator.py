@@ -10,7 +10,7 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, parent_dir)
 import importlib.util
 
-from src.core.utils import evaluate_cell_hit_cnt, evaluate_df_prefix_hit_cnt
+from utils import evaluate_cell_hit_cnt, evaluate_df_prefix_hit_cnt
 from initial_program import Evolved
 from quick_greedy import QuickGreedy
 

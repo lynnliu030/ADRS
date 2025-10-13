@@ -1,0 +1,32 @@
+2025-10-12 20:02:45,566 - openevolve.controller - INFO - Logging to openevolve/examples/ADRS/cloudcast/full_output/logs/openevolve_20251012_200245.log
+2025-10-12 20:02:45,566 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-10-12 20:02:45,586 - openevolve.llm.openai - INFO - Initialized OpenAI LLM with model: gemini-2.5-pro
+2025-10-12 20:02:45,593 - openevolve.llm.openai - INFO - Initialized OpenAI LLM with model: o3
+2025-10-12 20:02:45,594 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gemini-2.5-pro (weight: 0.20), o3 (weight: 0.80)
+2025-10-12 20:02:45,608 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gemini-2.5-pro (weight: 0.20), o3 (weight: 0.80)
+2025-10-12 20:02:45,608 - openevolve.prompt.sampler - INFO - Initialized prompt sampler
+2025-10-12 20:02:45,608 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-10-12 20:02:45,609 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-10-12 20:02:47,325 - datasets - INFO - PyTorch version 2.1.1 available.
+2025-10-12 20:02:47,326 - datasets - INFO - Polars version 1.7.1 available.
+2025-10-12 20:02:57,229 - openevolve.evaluator - INFO - Successfully loaded evaluation function from openevolve/examples/ADRS/cloudcast/evaluator.py
+2025-10-12 20:02:57,229 - openevolve.evaluator - INFO - Initialized evaluator with openevolve/examples/ADRS/cloudcast/evaluator.py
+2025-10-12 20:02:57,230 - openevolve.controller - INFO - Initialized OpenEvolve with openevolve/examples/ADRS/cloudcast/initial_program.py
+2025-10-12 20:02:57,230 - openevolve.controller - INFO - Adding initial program to database
+2025-10-12 20:02:57,231 - openevolve.evaluator - INFO - Evaluated program d6e01eef-9ed9-4a3d-8df4-2341f1481d3c in 0.00s: combined_score=0.0000, runs_successfully=0.0000, error=No configuration files found. Checked: ['examples/config/intra_aws.json', 'examples/config/intra_azure.json', 'examples/config/intra_gcp.json', 'examples/config/inter_agz.json', 'examples/config/inter_gaz2.json']
+2025-10-12 20:02:57,232 - openevolve.database - INFO - New MAP-Elites cell occupied: {'complexity': 5, 'diversity': 0}
+2025-10-12 20:02:57,237 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-10-12 20:02:57,240 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-10-12 20:02:57,240 - openevolve.controller - INFO - Using island-based evolution with 3 islands
+2025-10-12 20:02:57,241 - openevolve.database - INFO - Island Status:
+2025-10-12 20:02:57,241 - openevolve.database - INFO -  * Island 0: 1 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0 (best: d6e01eef-9ed9-4a3d-8df4-2341f1481d3c)
+2025-10-12 20:02:57,241 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-10-12 20:02:57,241 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-10-12 20:02:57,241 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 100 iterations (total: 101)
+2025-10-12 20:03:05,711 - openevolve.controller - INFO - Received signal 2, initiating graceful shutdown...
+2025-10-12 20:03:05,713 - openevolve.process_parallel - INFO - Graceful shutdown requested...
+2025-10-12 20:03:05,713 - openevolve.process_parallel - INFO - Shutdown requested, canceling remaining evaluations...
+2025-10-12 20:03:05,714 - openevolve.process_parallel - INFO - Evolution completed
+2025-10-12 20:03:05,714 - openevolve.controller - INFO - Evolution stopped due to shutdown request
+2025-10-12 20:03:05,964 - openevolve.controller - INFO - Force exit requested - terminating immediately
+2025-10-12 20:03:06,010 - openevolve.controller - INFO - Force exit requested - terminating immediately

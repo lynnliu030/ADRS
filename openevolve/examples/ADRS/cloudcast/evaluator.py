@@ -44,11 +44,11 @@ def evaluate(program_path):
         
         # Configuration - individual JSON file paths
         config_files = [
-            "examples/table1/intra_aws.json",
-            "examples/table1/intra_azure.json", 
-            "examples/table1/intra_gcp.json",
-            "examples/table1/inter_agz.json",
-            "examples/table1/inter_gaz2.json"
+            "examples/config/intra_aws.json",
+            "examples/config/intra_azure.json", 
+            "examples/config/intra_gcp.json",
+            "examples/config/inter_agz.json",
+            "examples/config/inter_gaz2.json"
         ]
         
         # Filter to only include files that exist

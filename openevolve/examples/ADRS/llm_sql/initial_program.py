@@ -1,5 +1,5 @@
 import pandas as pd
-from src.core.algos.solver import Algorithm
+from solver import Algorithm
 from typing import Tuple, List
 from typing import List, Dict
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
