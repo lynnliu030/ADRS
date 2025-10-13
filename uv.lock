@@ -96,7 +96,7 @@ wheels = [
 [[package]]
 name = "cant-be-late"
 version = "0.1.0"
-source = { editable = "examples/cant-be-late-simulator" }
+source = { editable = "openevolve/examples/ADRS/cant-be-late-simulator" }
 dependencies = [
     { name = "colorama" },
     { name = "configargparse" },
@@ -1718,7 +1718,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'", specifier = ">=22.0.0" },
-    { name = "cant-be-late", marker = "extra == 'cant-be-late'", editable = "examples/cant-be-late-simulator" },
+    { name = "cant-be-late", marker = "extra == 'cant-be-late'", editable = "openevolve/examples/ADRS/cant-be-late-simulator" },
     { name = "flask" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=5.10.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=0.950" },

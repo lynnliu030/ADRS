@@ -8,3 +8,5 @@ logs/*
 checkpoints/*
 
 .env
+
+openevolve_output/
