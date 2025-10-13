@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple, Optional, Union
 
 # --- Configuration ---
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(SCRIPT_DIR) # Go up one level
+PROJECT_ROOT = os.path.join(SCRIPT_DIR, "simulator")
 
 MAIN_SIMULATOR_PATH = os.path.join(PROJECT_ROOT, 'main.py')
 DATA_PATH = os.path.join(PROJECT_ROOT, "data/converted_multi_region_aligned")

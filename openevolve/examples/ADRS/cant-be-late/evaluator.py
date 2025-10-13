@@ -22,8 +22,7 @@ from openevolve.evaluation_result import EvaluationResult
 # Paths / imports
 # -----------------------------------------------------------------------------
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_ROOT = os.path.join(PARENT_DIR, "cant-be-late-simulator")
+PROJECT_ROOT = os.path.join(CURRENT_DIR, "simulator")
 SIM_STRATEGY_DIR = os.path.join(PROJECT_ROOT, "openevolve_single_region_strategy")
 
 if SIM_STRATEGY_DIR not in sys.path:
