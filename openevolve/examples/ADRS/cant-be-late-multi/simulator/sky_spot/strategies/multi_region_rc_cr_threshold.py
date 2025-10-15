@@ -18,9 +18,9 @@ logger = logging.getLogger(__name__)
 
 class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
     """
-    这是一个“混合实验”版本。
-    它使用了脚本B的“粘滞”名称，但内部嫁接了脚本A的、基于全局RC/CR的决策逻辑。
-    用于验证 _condition2() 是否是导致性能下降的根源。
+    Hybrid experimental version.
+    Keeps the sticky naming from script B but uses script A's global RC/CR decision logic.
+    Used to verify whether _condition2() causes the performance drop.
     """
 
     NAME = "multi_region_rc_cr_threshold"
@@ -28,7 +28,7 @@ class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
     def __init__(self, args):
         super().__init__(args)
 
-    # --- 从脚本A嫁接过来的RC/CR公式 ---
+    # --- RC/CR formula copied from script A ---
     def _condition(self):
         c_0 = self.task_duration
         c_t = self.task_duration - sum(self.task_done_time)
@@ -53,10 +53,10 @@ class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
         best_region = availabilities.index(True) if global_has_spot else None
         return global_has_spot, best_region
 
-    # --- 核心改动：用脚本A的_step方法，替换掉脚本B原来的_step方法 ---
+    # --- Core change: replace script B's _step with script A's version ---
     def _step(self, last_cluster_type: ClusterType, has_spot: bool) -> ClusterType:
         """
-        这是从脚本A完整复制过来的决策逻辑。
+        Decision logic copied verbatim from script A.
         """
         env = self.env
         global_has_spot, best_spot_region = self.get_global_spot_status()
@@ -70,22 +70,22 @@ class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
         if remaining_task_time <= 1e-3:
             return ClusterType.NONE
 
-        # 初始决策基于全局Spot
+        # Initial decision based on global spot availability
         request_type = ClusterType.SPOT if global_has_spot else ClusterType.NONE
 
-        # 使用RC/CR公式进行修正
+        # Adjust decision using the RC/CR formula
         if self._condition() < 0:
             request_type = (
                 ClusterType.SPOT if global_has_spot else ClusterType.ON_DEMAND
             )
 
-        # **关键的粘滞逻辑**
+        # **Sticky logic**
         if last_cluster_type == ClusterType.ON_DEMAND:
             if not global_has_spot or self._condition2() >= 0:
                 logger.debug(f"{env.tick}: Keep on-demand VM due to _condition2")
                 request_type = ClusterType.ON_DEMAND
 
-        # Deadline压力判断
+        # Deadline pressure check
         total_task_remaining = (
             math.ceil((remaining_task_time + self.restart_overhead) / env.gap_seconds)
             * env.gap_seconds
@@ -103,9 +103,9 @@ class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
             if self.restart_overhead == 0 and global_has_spot:
                 request_type = ClusterType.SPOT
 
-        # 切换逻辑
+        # Switching logic
         if request_type == ClusterType.SPOT and best_spot_region is not None:
-            if not has_spot:  # has_spot是本地的spot情况
+            if not has_spot:  # has_spot reflects local spot availability
                 if env.get_current_region() != best_spot_region:
                     env.switch_region(best_spot_region)
                     logger.debug(
@@ -114,4 +114,3 @@ class MultiRegionRCCRThresholdStrategy(MultiRegionStrategy):
 
         logger.debug(f"Tick {env.tick}: Final Decision: {request_type.name}")
         return request_type
-

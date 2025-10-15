@@ -9,4 +9,4 @@ checkpoints/*
 
 .env
 
-openevolve_output/
+openevolve_output*/
