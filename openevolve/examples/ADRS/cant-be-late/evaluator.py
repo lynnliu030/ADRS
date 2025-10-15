@@ -7,7 +7,6 @@ import argparse
 import glob
 import json
 import logging
-import math
 import os
 import signal
 import sys
@@ -33,7 +32,6 @@ from sim_worker import run_single_simulation  # noqa: E402
 # -----------------------------------------------------------------------------
 # Logging / WANDB
 # -----------------------------------------------------------------------------
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 os.environ.setdefault("WANDB_MODE", "offline")
@@ -62,6 +60,11 @@ FAILED_SCORE = -100000.0
 
 MAX_WORKERS = int(os.environ.get('EVALUATOR_MAX_WORKERS', '48'))
 FUTURE_TIMEOUT = float(os.environ.get('EVALUATOR_TIMEOUT', '300'))
+
+
+def _progress_enabled() -> bool:
+    """Check whether CLI progress updates should be emitted."""
+    return os.environ.get("EVALUATOR_PROGRESS", "0") == "1"
 
 
 def build_trace_pool(min_required_hours: float) -> dict[float, dict[str, list[str]]]:
@@ -242,6 +245,9 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
     executor = ProcessPoolExecutor(max_workers=max_workers, **executor_kwargs)
     future_to_info = {}
 
+    progress_enabled = _progress_enabled()
+    completed = 0
+
     all_warnings: list[str] = []
     all_errors: list[str] = []
     traces_by_config: dict[str, list[dict]] = defaultdict(list)
@@ -290,6 +296,14 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
                 "combined_score": FAILED_SCORE,
                 "error": "No evaluations scheduled (trace pool empty)",
             }
+
+        if progress_enabled:
+            print(
+                f"Progress: 0/{total_evaluations} (0.0%)",
+                end="\r",
+                file=sys.stderr,
+                flush=True,
+            )
 
         for future in as_completed(future_to_info):
             env_path, trace_file, config = future_to_info[future]
@@ -350,10 +364,21 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
                         "combined_score": FAILED_SCORE,
                         "error": f"Not all runs successful: {error_msg}",
                     }
+                completed += 1
+                if progress_enabled:
+                    percent = (completed / total_evaluations) * 100.0
+                    print(
+                        f"Progress: {completed}/{total_evaluations} ({percent:.1f}%)",
+                        end="\r",
+                        file=sys.stderr,
+                        flush=True,
+                    )
             except Exception as exc:  # pragma: no cover
                 for pending in future_to_info:
                     pending.cancel()
                 executor.shutdown(wait=False, cancel_futures=True)
+                if progress_enabled:
+                    print("", file=sys.stderr)
                 return {
                     "runs_successfully": 0.0,
                     "score": 0.0,
@@ -366,14 +391,19 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
         if old_sigterm is not None:
             signal.signal(signal.SIGTERM, old_sigterm)
         executor.shutdown(wait=True)
+        if progress_enabled:
+            print("", file=sys.stderr)
 
     avg_cost = float(np.mean(all_costs)) if all_costs else 0.0
     std_cost = float(np.std(all_costs)) if all_costs else 0.0
+    min_cost = float(np.min(all_costs)) if all_costs else 0.0
+    max_cost = float(np.max(all_costs)) if all_costs else 0.0
     score = -avg_cost
     combined_score = score - 0.25 * std_cost
 
     logger.info("All %d simulations completed successfully!", len(all_costs))
     logger.info("Average cost: $%.2f", avg_cost)
+    logger.info("Cost range: $%.2f – $%.2f", min_cost, max_cost)
     logger.info("Score (negative cost): %.2f", score)
 
     scenario_stats = {}
@@ -408,6 +438,8 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
         "combined_score": combined_score,
         "avg_cost": avg_cost,
         "cost_std": std_cost,
+        "min_cost": min_cost,
+        "max_cost": max_cost,
         "scenario_stats": scenario_stats,
     }
 
@@ -419,6 +451,8 @@ def evaluate_stage2(program_path: str) -> EvaluationResult | dict:
         "scenario_summary": artifact_text,
         "scenario_stats_json": json.dumps(scenario_stats, ensure_ascii=False),
     }
+    if trace_infos:
+        artifacts["trace_costs_json"] = json.dumps(trace_infos, ensure_ascii=False)
     if availability_stats:
         artifacts["availability_stats_json"] = json.dumps(availability_stats, ensure_ascii=False)
     if baseline_stats:

@@ -1,0 +1,45 @@
+# SkyPilot task definition for running the ADRS full evaluator remotely.
+name: adrs-full-eval
+
+# Sync the entire repository to the remote VM before execution.
+workdir: .
+
+resources:
+  cloud: aws
+  region: us-west-2
+  cpus: 64+
+  memory: 128+
+  disk_size: 200
+  autostop:
+    idle_minutes: 15
+    down: true
+
+file_mounts:
+  ~/sky_workdir/skypilot_artifacts: skypilot_artifacts
+  ~/sky_workdir/openevolve/examples/ADRS/cant-be-late/simulator/data/real: openevolve/examples/ADRS/cant-be-late/simulator/data/real
+  ~/sky_workdir/openevolve/examples/ADRS/cant-be-late/openevolve_output: openevolve/examples/ADRS/cant-be-late/openevolve_output
+
+envs:
+  PROGRAM_PATH: openevolve/examples/ADRS/cant-be-late/openevolve_output/checkpoints/checkpoint_100/best_program.py
+  OUTPUT_PATH: skypilot_artifacts/full_eval_remote.json
+
+setup: |
+  set -euxo pipefail
+  cd ~/sky_workdir
+  uv venv .venv
+  source .venv/bin/activate
+  uv pip install -e .
+  uv pip install -e openevolve/examples/ADRS/cant-be-late/simulator
+
+run: |
+  set -euxo pipefail
+  cd ~/sky_workdir
+  source .venv/bin/activate
+  mkdir -p "$(dirname "${OUTPUT_PATH}")"
+  python openevolve/examples/ADRS/cant-be-late/full_eval.py \
+    "${PROGRAM_PATH}" \
+    --baseline openevolve/examples/ADRS/cant-be-late/initial_greedy.py \
+    --baseline openevolve/examples/ADRS/cant-be-late/referenced_up.py \
+    --output "${OUTPUT_PATH}" \
+    --progress \
+    --log-level WARNING

@@ -101,13 +101,13 @@ class Strategy:
 
         try:
             last_cluster_type, has_spot = env.observe()
-        except ValueError:
-            print('remaining task',
-                  self.task_duration - sum(self.task_done_time))
-            print('finsihed', self.task_done)
-            print(env.config)
-            print(self.config)
-            raise
+        except ValueError as exc:
+            logger.warning(
+                'env.observe() failed with %s; treating as no spot availability '
+                'and continuing safely',
+                exc,
+            )
+            last_cluster_type, has_spot = ClusterType.NONE, False
         if last_cluster_type == ClusterType.NONE:
             self.task_done_time.append(0)
         else:
