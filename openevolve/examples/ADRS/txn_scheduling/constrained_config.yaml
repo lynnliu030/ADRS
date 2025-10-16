@@ -1,0 +1,192 @@
+# OpenEvolve Default Configuration
+# This file contains all available configuration options with sensible defaults
+# You can use this as a template for your own configuration
+
+# General settings
+max_iterations: 100                  # Maximum number of evolution iterations
+checkpoint_interval: 5               # Save checkpoints every N iterations
+log_level: "DEBUG"                     # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+log_dir: null                         # Custom directory for logs (default: output_dir/logs)
+random_seed: 42                       # Random seed for reproducibility (null = random, 42 = default)
+
+# Evolution settings
+diff_based_evolution: true            # Use diff-based evolution (true) or full rewrites (false)
+max_code_length: 60000                # Maximum allowed code length in characters
+
+# Early stopping settings
+early_stopping_patience: null         # Stop after N iterations without improvement (null = disabled)
+convergence_threshold: 0.001          # Minimum improvement required to reset patience counter
+early_stopping_metric: "combined_score"  # Metric to track for early stopping
+
+# LLM configuration
+llm:
+  # Models for evolution
+  models:
+    # List of available models with their weights
+    - name: "gemini-2.5-pro"
+      weight: 0.8  # Lower weight for the conservative model
+      # api_base: "https://api.openai.com/v1"
+      # api_key: ${OPENAI_API_KEY}
+      api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      api_key: ${GEMINI_API_KEY}
+    - name: "o3"
+      weight: 0.2  # Higher weight for the creative/exploratory model
+      api_base: "https://api.openai.com/v1"
+      api_key: ${OPENAI_API_KEY}
+
+  # Models for LLM feedback
+  # evaluator_models:
+  #   # List of available models with their weights
+  #   - name: "gemini-2.0-flash-lite"
+  #     weight: 0.8
+  #   - name: "gemini-2.0-flash"
+  #     weight: 0.2
+
+  # API configuration
+  # api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"  # Base URL for API (change for non-OpenAI models)
+  # api_key: null                       # API key (defaults to OPENAI_API_KEY env variable)
+
+  # Generation parameters
+  temperature: 1.0                    # Temperature for generation (higher = more creative)
+  top_p: 0.95                         # Top-p sampling parameter
+  max_tokens: 10000                    # Maximum tokens to generate
+
+  # Request parameters
+  timeout: 200                         # Timeout for API requests in seconds
+  retries: 3                          # Number of retries for failed requests
+  retry_delay: 5                      # Delay between retries in seconds
+
+# Prompt configuration
+prompt:
+  template_dir: null                  # Custom directory for prompt templates
+  system_message: |
+    You are an expert in database transaction optimization. 
+    Only change code within EVOLVE-BLOCK-START and EVOLVE-BLOCK-END.
+    Your task is to improve a scheduling function to find better schedules for transactional workloads made up of read and write operations to data items. There are conflicts between these transactions on items and reducing the delay of these conflicts will lead to schedules with lower makespan. Focus on improving the get_best_schedule function to find a schedule with as low makespan as possible.
+
+    **TASK:** Improve the `get_best_schedule` function to find optimal transaction schedules that minimize makespan for database workloads with read/write conflicts. The runtime should be less than 2 seconds. 
+    Do not sort transactions. Runtime MUST BE be O(n) where n is the number of transactions.
+    Assume list operations are O(1), sequence copy operations are O(1), and get_opt_seq_cost is O(1).
+    Once a transaction is scheduled, it should NOT be moved. For example, local swap with transactions scheduled in a previous iteration is not allowed.
+
+    **PROBLEM SPECIFICS:**
+    - **Input:** JSON workload with transactions like `"txn0":"w-17 r-5 w-3 r-4 r-54 r-14 w-6 r-11 w-22 r-7 w-1 w-8 w-9 w-27 r-2 r-25"`
+    - **Operations:** Each transaction is a sequence of read (`r-{key}`) and write (`w-{key}`) operations on data items
+    - **Conflicts:** Read-write and write-write conflicts on the same key create dependencies between transactions
+    - **Goal:** Find transaction ordering that minimizes total makespan
+
+    Focus on evolving the `get_best_schedule` function to produce the best schedule possible with the lowest makespan.
+
+    Explain step-by-step the reasoning process for your solution and how this will lead to a better schedule.
+
+  evaluator_system_message: |
+    You are an expert code reviewer.
+    The function should return a schedule with all transactions present.
+    Do not sort transactions. Runtime MUST BE be O(n) where n is the number of transactions.
+    Assume list operations are O(1), sequence copy operations are O(1), and get_opt_seq_cost is O(1).
+    Once a transaction is scheduled, it should NOT be moved. For example, local swap with transactions scheduled in a previous iteration is not allowed.
+
+
+  # Number of examples to include in the prompt
+  num_top_programs: 3                 # Number of top-performing programs to include
+  num_diverse_programs: 2             # Number of diverse programs to include
+
+  # Template stochasticity
+  use_template_stochasticity: true    # Use random variations in templates for diversity
+  template_variations:                # Different phrasings for parts of the template
+    improvement_suggestion:
+      - "Here's how we could improve this code:"
+      - "I suggest the following improvements:"
+      - "We can enhance this code by:"
+
+  # Artifact rendering
+  include_artifacts: true             # Include execution outputs/errors in prompt
+  max_artifact_bytes: 20480           # Maximum artifact size in bytes (20KB default)
+  artifact_security_filter: true      # Apply security filtering to artifacts
+
+  # Feature extraction and program labeling thresholds
+  # These control how the LLM perceives and categorizes programs
+  suggest_simplification_after_chars: 5000     # Suggest simplifying if program exceeds this many characters
+  include_changes_under_chars: 1000           # Include change descriptions in features if under this length  
+  concise_implementation_max_lines: 10        # Label as "concise" if program has this many lines or fewer
+  comprehensive_implementation_min_lines: 50  # Label as "comprehensive" if program has this many lines or more
+
+  # Note: meta-prompting features are not yet implemented
+
+# Database configuration
+database:
+  # General settings
+  db_path: null                       # Path to persist database (null = in-memory only)
+  in_memory: true                     # Keep database in memory for faster access
+  log_prompts: true                  # If true, log all prompts and responses into the database
+
+  # Evolutionary parameters
+  population_size: 1000               # Maximum number of programs to keep in memory
+  archive_size: 100                   # Size of elite archive
+  num_islands: 5                      # Number of islands for island model (separate populations)
+
+  # Island-based evolution parameters
+  # Islands provide diversity by maintaining separate populations that evolve independently.
+  # Migration periodically shares the best solutions between adjacent islands.
+  migration_interval: 50              # Migrate between islands every N generations
+  migration_rate: 0.1                 # Fraction of top programs to migrate (0.1 = 10%)
+
+  # Selection parameters
+  elite_selection_ratio: 0.1          # Ratio of elite programs to select
+  exploration_ratio: 0.2              # Ratio of exploration vs exploitation
+  exploitation_ratio: 0.7             # Ratio of exploitation vs random selection
+  # Note: diversity_metric is fixed to "edit_distance" (feature_based not implemented)
+
+  # Feature map dimensions for MAP-Elites
+  # Default if not specified: ["complexity", "diversity"]
+  # 
+  # Built-in features (always available, computed by OpenEvolve):
+  #   - "complexity": Code length
+  #   - "diversity": Code structure diversity
+  #
+  # You can mix built-in features with custom metrics from your evaluator:
+  feature_dimensions:                 # Dimensions for MAP-Elites feature map (for diversity, NOT fitness)
+    - "complexity"                    # Code length (built-in)
+    - "diversity"                     # Code diversity (built-in)
+  # Example with custom features:
+  # feature_dimensions:
+  #   - "performance"                 # Must be returned by your evaluator
+  #   - "correctness"                 # Must be returned by your evaluator
+  #   - "memory_efficiency"           # Must be returned by your evaluator
+  
+  # Number of bins per dimension
+  # Can be a single integer (same for all dimensions) or a dict
+  feature_bins: 10                    # Number of bins per dimension
+  # Example of per-dimension configuration:
+  # feature_bins:
+  #   complexity: 10                  # 10 bins for complexity
+  #   diversity: 15                   # 15 bins for diversity
+  #   performance: 20                 # 20 bins for custom metric
+  
+  diversity_reference_size: 20        # Size of reference set for diversity calculation
+
+# Evaluator configuration
+evaluator:
+  # Fitness calculation: Uses 'combined_score' if available, otherwise averages
+  # all metrics EXCEPT those listed in database.feature_dimensions
+  
+  # General settings
+  timeout: 300                        # Maximum evaluation time in seconds
+  max_retries: 3                      # Maximum number of retries for evaluation
+
+  # Note: resource limits (memory_limit_mb, cpu_limit) are not yet implemented
+
+  # Evaluation strategies
+  cascade_evaluation: true            # Use cascade evaluation to filter bad solutions early
+  cascade_thresholds:                 # Thresholds for advancing to next evaluation stage
+    - 0.5                             # First stage threshold
+    - 0.75                            # Second stage threshold
+    - 0.9                             # Third stage threshold
+
+  # Parallel evaluation
+  parallel_evaluations: 4             # Number of parallel evaluations
+  # Note: distributed evaluation is not yet implemented
+
+  # LLM-based feedback (experimental)
+  use_llm_feedback: false             # Use LLM to evaluate code quality
+  llm_feedback_weight: 0.1            # Weight for LLM feedback in final score
